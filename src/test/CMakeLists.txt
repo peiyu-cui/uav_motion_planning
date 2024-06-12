@@ -1,0 +1,55 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(test)
+
+## Compile as C++11, supported in ROS Kinetic and newer
+# add_compile_options(-std=c++11)
+
+find_package(Eigen3 REQUIRED)
+find_package(PCL 1.7 REQUIRED)
+
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
+  plan_env
+  cv_bridge
+)
+
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES test
+  CATKIN_DEPENDS roscpp rospy std_msgs plan_env 
+#  DEPENDS system_lib
+)
+
+###########
+## Build ##
+###########
+
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+include_directories(
+  SYSTEM
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
+  ${PCL_INCLUDE_DIRS}
+)
+
+## Declare a C++ library
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/test.cpp
+# )
+
+## Declare a C++ executable
+add_executable(test_grid_map src/test_grid_map.cpp)
+
+## Specify libraries to link a library or executable target against
+target_link_libraries(test_grid_map
+  ${catkin_LIBRARIES}
+)
+

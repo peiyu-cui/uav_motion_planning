@@ -1,0 +1,33 @@
+<launch>
+  <!-- <rosparam file="$(find ego_planner)/config/agent_list.yaml" command="load" /> -->
+  
+  <!-- swarm robots -->
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf0">
+    <arg name="namespace" value="cf0" />
+  </include>
+
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf1">
+    <arg name="namespace" value="cf1" />
+  </include>
+
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf2">
+    <arg name="namespace" value="cf2" />
+  </include>
+
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf3">
+    <arg name="namespace" value="cf3" />
+  </include>
+
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf4">
+    <arg name="namespace" value="cf4" />
+  </include>
+
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf5">
+    <arg name="namespace" value="cf5" />
+  </include>
+
+  <include file="$(find plan_manage)/launch/single_run_in_sim.launch" ns="cf6">
+    <arg name="namespace" value="cf6" />
+  </include>
+
+</launch>
