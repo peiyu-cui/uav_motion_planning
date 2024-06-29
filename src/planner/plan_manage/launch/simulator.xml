@@ -1,5 +1,5 @@
 <launch>
-  <arg name="init_x" value="0.0"/>
+  <arg name="init_x" value="-12.0"/>
   <arg name="init_y" value="0.0"/>
   <arg name="init_z" value="0.0"/> 
   <arg name="map_size_x_"/>
@@ -87,7 +87,7 @@
       <!-- camera parameters -->
         <rosparam command="load" file="$(find local_sensing_node)/params/camera.yaml" />
       <!-- common parameters -->
-        <param name="sensing_horizon"  value="5.0" />
+        <param name="sensing_horizon"  value="50.0" />
         <param name="sensing_rate"     value="30.0"/>
         <param name="estimation_rate"  value="30.0"/>
 

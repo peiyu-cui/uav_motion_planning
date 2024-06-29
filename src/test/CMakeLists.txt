@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(test)
 
+
+SET(CMAKE_BUILD_TYPE Debug)
+
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -15,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   plan_env
+  path_searching
   cv_bridge
 )
 
@@ -22,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES test
-  CATKIN_DEPENDS roscpp rospy std_msgs plan_env 
+  CATKIN_DEPENDS roscpp rospy std_msgs plan_env
 #  DEPENDS system_lib
 )
 
@@ -46,10 +51,17 @@ include_directories(
 # )
 
 ## Declare a C++ executable
-add_executable(test_grid_map src/test_grid_map.cpp)
+add_executable(test_path_searching src/test_path_searching.cpp)
+
+add_executable(test_astar_node src/test_astar.cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(test_grid_map
+target_link_libraries(test_path_searching
+  ${catkin_LIBRARIES}
+)
+
+
+target_link_libraries(test_astar_node
   ${catkin_LIBRARIES}
 )
 

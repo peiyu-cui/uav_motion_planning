@@ -3,8 +3,7 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /Grid1
+      Expanded: ~
       Splitter Ratio: 0.5
     Tree Height: 297
   - Class: rviz/Selection
@@ -25,7 +24,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: local_cloud
+    SyncSource: grid_map_inflate
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -182,8 +181,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 2.4519166946411133
-            Min Value: -0.5594779253005981
+            Max Value: 2.9600000381469727
+            Min Value: -2.940000057220459
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -201,8 +200,8 @@ Visualization Manager:
           Selectable: true
           Size (Pixels): 3
           Size (m): 0.10000000149011612
-          Style: Squares
-          Topic: /pcl_render_node/rendered_pcl
+          Style: Points
+          Topic: /pcl_render_node/cloud
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -249,6 +248,18 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /test_path_searching/path
+          Name: astar_path
+          Namespaces:
+            astar/path: true
+          Queue Size: 100
+          Value: true
+      Enabled: true
+      Name: Pathsearching
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
@@ -279,7 +290,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.064685821533203
+      Distance: 32.005126953125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -287,17 +298,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.12213437259197235
-        Y: -0.5141420960426331
-        Z: 1.6698715686798096
+        X: -1.465969443321228
+        Y: 1.050468921661377
+        Z: 2.867692470550537
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4697977304458618
+      Pitch: 0.489797979593277
       Target Frame: <Fixed Frame>
-      Yaw: 3.1153321266174316
+      Yaw: 3.165335178375244
     Saved: ~
 Window Geometry:
   Displays:
@@ -316,6 +327,6 @@ Window Geometry:
     collapsed: false
   Width: 1386
   X: 283
-  Y: 71
+  Y: 27
   depth image:
     collapsed: false

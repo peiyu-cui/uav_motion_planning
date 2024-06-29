@@ -4,7 +4,9 @@
   <arg name="map_size_x" default="40.0"/>
   <arg name="map_size_y" default="20.0"/>
   <arg name="map_size_z" default="5.0"/>
-  
+
+  <!-- rviz -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find plan_manage)/config/default.rviz" required="true"/>  
   
   <!-- use simulator -->
     <!-- pid controller -->

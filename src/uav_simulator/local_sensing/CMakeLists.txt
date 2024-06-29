@@ -3,8 +3,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-# set(ENABLE_CUDA false)
-set(ENABLE_CUDA true)
+set(ENABLE_CUDA false)
+# set(ENABLE_CUDA true)
 
 
 # GTX 1080, GTX 1070, GTX 1060, GTX 1050, GTX 1030, Titan Xp, Tesla P40, Tesla P4

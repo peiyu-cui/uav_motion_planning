@@ -331,8 +331,8 @@ int main(int argc, char** argv) {
 
   ros::Duration(0.5).sleep();
 
-  // RandomMapGenerate();
-  FixMapgenerate();
+  RandomMapGenerate();
+  // FixMapgenerate();
 
   ros::Rate loop_rate(_sense_rate);
 

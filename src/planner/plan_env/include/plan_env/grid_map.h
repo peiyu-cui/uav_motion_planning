@@ -346,6 +346,7 @@ inline bool GridMap::isInMap(const Eigen::Vector3d& pos) {
   }
   if (pos(0) > mp_.map_max_boundary_(0) - 1e-4 || pos(1) > mp_.map_max_boundary_(1) - 1e-4 ||
       pos(2) > mp_.map_max_boundary_(2) - 1e-4) {
+        // cout << "greater than max range!" << endl;
     return false;
   }
   return true;

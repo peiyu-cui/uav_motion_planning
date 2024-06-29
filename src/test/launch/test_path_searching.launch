@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <launch>
 
-  <node name="test_grid_map" pkg="test" type="test_grid_map" output="screen">
+  <node name="test_path_searching" pkg="test" type="test_path_searching" output="screen">
     <param name="grid_map/resolution" value="0.1"/>
     <param name="grid_map/map_size_x"   value="40.0" /> 
     <param name="grid_map/map_size_y"   value="40.0" /> 
-    <param name="grid_map/map_size_z"   value="3.0" /> 
-    <param name="grid_map/local_update_range_x"  value="5.5" /> 
-    <param name="grid_map/local_update_range_y"  value="5.5" /> 
-    <param name="grid_map/local_update_range_z"  value="4.5" /> 
+    <param name="grid_map/map_size_z"   value="5.0" /> 
+    <param name="grid_map/local_update_range_x"  value="40.0" /> 
+    <param name="grid_map/local_update_range_y"  value="40.0" /> 
+    <param name="grid_map/local_update_range_z"  value="5.0" /> 
     <param name="grid_map/obstacles_inflation"     value="0.099" /> 
     <param name="grid_map/local_map_margin" value="30"/>
     <param name="grid_map/ground_height"        value="-0.01"/>
@@ -39,16 +39,23 @@
     <param name="grid_map/show_occ_time"  value="false"/>
     <param name="grid_map/pose_type"     value="2"/>  
     <param name="grid_map/frame_id"      value="world"/>
-    <!-- local cloud lidar -->
-    <!-- <remap from="/grid_map/cloud" to="/pcl_render_node/rendered_pcl"/> -->
+
+    <!-- astar parameters -->
+    <param name="astar/resolution" value="0.1"/>
+    <param name="astar/lambda_heu" value="1.5"/>
+    <param name="astar/allocated_node_num" value="1000000"/>
+    
+    <!-- local cloud lidar not use cuda-->
+    <remap from="/grid_map/cloud" to="/pcl_render_node/cloud"/>
     <remap from="/grid_map/odom" to="/visual_slam/odom"/>
-    <!-- depth camera -->
-    <remap from="/grid_map/depth" to="/pcl_render_node/depth"/>
-    <remap from="/grid_map/pose" to="/pcl_render_node/camera_pose"/>
     
-    
-    
-    
+    <!-- depth camera type = 1 use cuda-->
+    <!-- <remap from="/grid_map/depth" to="/pcl_render_node/depth"/> 
+    <remap from="/grid_map/pose" to="/pcl_render_node/camera_pose"/> -->
+
+    <!-- depth camera type = 2 use cuda-->
+    <!-- <remap from="/grid_map/depth" to="/pcl_render_node/depth"/>
+    <remap from="/grid_map/odom" to="/visual_slam/odom"/> -->
 
   </node>
   

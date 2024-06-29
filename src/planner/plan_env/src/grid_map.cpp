@@ -95,6 +95,7 @@ void GridMap::initMap(ros::NodeHandle &nh)
 
   /* init callback */
 
+  // use depth image and pose stamped or odometry
   depth_sub_.reset(new message_filters::Subscriber<sensor_msgs::Image>(node_, "/grid_map/depth", 50));
 
   if (mp_.pose_type_ == POSE_STAMPED)
