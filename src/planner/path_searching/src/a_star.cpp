@@ -45,6 +45,7 @@ namespace path_searching
 
   int Astar::search(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt, std::vector<Eigen::Vector3d>& path) {
     // if end_pt is out of map, return NO_PATH_FOUND
+    ros::Time start_time = ros::Time::now();
     if (grid_map_->isInMap(end_pt) == false) {
       std::cerr << "Error: end_pt is out of map." << std::endl;
       return NO_PATH_FOUND;
@@ -74,8 +75,12 @@ namespace path_searching
           abs(current_node->position(1)-end_pt(1)) < resolution_ &&
           abs(current_node->position(2)-end_pt(2)) < resolution_)
         {
+          ros::Time end_time = ros::Time::now();
           std::cout << "reached end_pt" << std::endl;
+          std::cout << "total_time: " << (end_time - start_time).toSec() << " seconds" << std::endl;
           PathNodePtr end_node = current_node;
+          std::cout << "use_node_num: " << use_node_num_ << std::endl;
+          std::cout << "total_cost:" << end_node->g_cost << std::endl;
           retrievePath(end_node, path);
           return REACH_END;
         }

@@ -70,7 +70,7 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "test_path_searching");
+  ros::init(argc, argv, "test_astar_searching");
   ros::NodeHandle nh("~");
 
   ros::Subscriber goal_sub = nh.subscribe<geometry_msgs::PoseStamped>("/goal", 10, &GoalCallback);

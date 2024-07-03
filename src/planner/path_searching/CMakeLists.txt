@@ -45,9 +45,16 @@ include_directories(
 link_directories(${PCL_LIBRARY_DIRS})
 
 
-add_library( path_searching
-  src/a_star.cpp)
+add_library(path_searching
+  src/a_star.cpp
+  src/rrt.cpp)
 
-target_link_libraries( path_searching
+target_link_libraries(path_searching
   ${catkin_LIBRARYS}
+  kdtree
   )
+
+add_library(kdtree
+  src/kdtree/kdtree.cpp)
+
+

@@ -114,6 +114,7 @@ class Astar {
     /* helper function */
     // Eigen::Vector3i posToIndex(Eigen::Vector3d pos);
     double getEuclHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
+    double getdiagonalHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
     void retrievePath(PathNodePtr end_node, std::vector<Eigen::Vector3d>& path);
 
   public:

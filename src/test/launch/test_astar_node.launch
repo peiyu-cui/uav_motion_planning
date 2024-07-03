@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="test" type="test_astar_node" name="test_astar_node" output="screen">
-  </node>
-</launch>

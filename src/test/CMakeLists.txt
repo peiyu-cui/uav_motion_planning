@@ -51,17 +51,33 @@ include_directories(
 # )
 
 ## Declare a C++ executable
-add_executable(test_path_searching src/test_path_searching.cpp)
 
 add_executable(test_astar_node src/test_astar.cpp)
 
+add_executable(test_rrt_node src/test_rrt.cpp)
+
+add_executable(test_astar_searching src/test_astar_searching.cpp)
+
+
+add_executable(test_rrt_searching src/test_rrt_searching.cpp)
+
+
 ## Specify libraries to link a library or executable target against
-target_link_libraries(test_path_searching
-  ${catkin_LIBRARIES}
-)
+
 
 
 target_link_libraries(test_astar_node
   ${catkin_LIBRARIES}
 )
 
+target_link_libraries(test_rrt_node
+${catkin_LIBRARIES}
+)
+
+target_link_libraries(test_astar_searching
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(test_rrt_searching
+${catkin_LIBRARIES}
+)

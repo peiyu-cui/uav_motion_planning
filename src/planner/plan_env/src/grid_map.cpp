@@ -9,45 +9,45 @@ void GridMap::initMap(ros::NodeHandle &nh)
 
   /* get parameter */
   double x_size, y_size, z_size;
-  node_.param("grid_map/resolution", mp_.resolution_, -1.0);
-  node_.param("grid_map/map_size_x", x_size, -1.0);
-  node_.param("grid_map/map_size_y", y_size, -1.0);
-  node_.param("grid_map/map_size_z", z_size, -1.0);
-  node_.param("grid_map/local_update_range_x", mp_.local_update_range_(0), -1.0);
-  node_.param("grid_map/local_update_range_y", mp_.local_update_range_(1), -1.0);
-  node_.param("grid_map/local_update_range_z", mp_.local_update_range_(2), -1.0);
-  node_.param("grid_map/obstacles_inflation", mp_.obstacles_inflation_, -1.0);
+  node_.param("grid_map/resolution", mp_.resolution_, 0.1);
+  node_.param("grid_map/map_size_x", x_size, 40.0);
+  node_.param("grid_map/map_size_y", y_size, 40.0);
+  node_.param("grid_map/map_size_z", z_size, 5.0);
+  node_.param("grid_map/local_update_range_x", mp_.local_update_range_(0), 5.0);
+  node_.param("grid_map/local_update_range_y", mp_.local_update_range_(1), 5.0);
+  node_.param("grid_map/local_update_range_z", mp_.local_update_range_(2), 5.0);
+  node_.param("grid_map/obstacles_inflation", mp_.obstacles_inflation_, 0.099);
 
-  node_.param("grid_map/fx", mp_.fx_, -1.0);
-  node_.param("grid_map/fy", mp_.fy_, -1.0);
-  node_.param("grid_map/cx", mp_.cx_, -1.0);
-  node_.param("grid_map/cy", mp_.cy_, -1.0);
+  node_.param("grid_map/fx", mp_.fx_, 387.229248046875);
+  node_.param("grid_map/fy", mp_.fy_, 387.229248046875);
+  node_.param("grid_map/cx", mp_.cx_, 321.04638671875);
+  node_.param("grid_map/cy", mp_.cy_, 243.44969177246094);
 
   node_.param("grid_map/use_depth_filter", mp_.use_depth_filter_, true);
-  node_.param("grid_map/depth_filter_tolerance", mp_.depth_filter_tolerance_, -1.0);
-  node_.param("grid_map/depth_filter_maxdist", mp_.depth_filter_maxdist_, -1.0);
-  node_.param("grid_map/depth_filter_mindist", mp_.depth_filter_mindist_, -1.0);
-  node_.param("grid_map/depth_filter_margin", mp_.depth_filter_margin_, -1);
-  node_.param("grid_map/k_depth_scaling_factor", mp_.k_depth_scaling_factor_, -1.0);
-  node_.param("grid_map/skip_pixel", mp_.skip_pixel_, -1);
+  node_.param("grid_map/depth_filter_tolerance", mp_.depth_filter_tolerance_, 0.15);
+  node_.param("grid_map/depth_filter_maxdist", mp_.depth_filter_maxdist_, 5.0);
+  node_.param("grid_map/depth_filter_mindist", mp_.depth_filter_mindist_, 0.2);
+  node_.param("grid_map/depth_filter_margin", mp_.depth_filter_margin_, 1);
+  node_.param("grid_map/k_depth_scaling_factor", mp_.k_depth_scaling_factor_, 1000.0);
+  node_.param("grid_map/skip_pixel", mp_.skip_pixel_, 2);
 
   node_.param("grid_map/p_hit", mp_.p_hit_, 0.70);
   node_.param("grid_map/p_miss", mp_.p_miss_, 0.35);
   node_.param("grid_map/p_min", mp_.p_min_, 0.12);
   node_.param("grid_map/p_max", mp_.p_max_, 0.97);
   node_.param("grid_map/p_occ", mp_.p_occ_, 0.80);
-  node_.param("grid_map/min_ray_length", mp_.min_ray_length_, -0.1);
-  node_.param("grid_map/max_ray_length", mp_.max_ray_length_, -0.1);
+  node_.param("grid_map/min_ray_length", mp_.min_ray_length_, 0.1);
+  node_.param("grid_map/max_ray_length", mp_.max_ray_length_, 4.5);
 
-  node_.param("grid_map/visualization_truncate_height", mp_.visualization_truncate_height_, 999.0);
-  node_.param("grid_map/virtual_ceil_height", mp_.virtual_ceil_height_, -0.1);
+  node_.param("grid_map/visualization_truncate_height", mp_.visualization_truncate_height_, 2.4);
+  node_.param("grid_map/virtual_ceil_height", mp_.virtual_ceil_height_, 2.5);
 
   node_.param("grid_map/show_occ_time", mp_.show_occ_time_, false);
   node_.param("grid_map/pose_type", mp_.pose_type_, 1);
 
   node_.param("grid_map/frame_id", mp_.frame_id_, string("world"));
   node_.param("grid_map/local_map_margin", mp_.local_map_margin_, 1);
-  node_.param("grid_map/ground_height", mp_.ground_height_, 1.0);
+  node_.param("grid_map/ground_height", mp_.ground_height_, -0.01);
 
   mp_.resolution_inv_ = 1 / mp_.resolution_;
   mp_.map_origin_ = Eigen::Vector3d(-x_size / 2.0, -y_size / 2.0, mp_.ground_height_);
