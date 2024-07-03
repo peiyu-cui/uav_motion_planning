@@ -37,7 +37,7 @@ catkin_make -DCMAKE_CXX_STANDARD=14
 
   * simulation:
 
-  ![Image](https://github.com/peiyu-cui/motion-planning/tree/main/pic/astar.gif)
+  ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/astar.gif?raw=true)
 
 ### 2. Sampling-Based Methods
 
@@ -71,7 +71,7 @@ catkin_make -DCMAKE_CXX_STANDARD=14
 
   * simulation:
 
-  ![Image](https://github.com/peiyu-cui/motion-planning/tree/main/pic/rrt.gif)
+  ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/rrt.gif?raw=true)
 
 
 
