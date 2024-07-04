@@ -40,17 +40,11 @@ catkin_make -DCMAKE_CXX_STANDARD=14
     * tie_breaker：enhance the speed of searching
   
     * weighted A*: 
-      $$
-      f(n)=\left\{
-      \begin{aligned}
-      g(n) & , & \lambda =0,Dijkstra \\
-      g(n)+h(n) & , &\lambda=1,A* \\
-      g(n)+\lambda h(n) & , & \lambda>1,A* Greedy
-      \end{aligned}
-      \right.
-      $$
       
-    
+      $$ f(n)=\left\{\begin{aligned} g(n) & , & \lambda =0,\text{Dijkstra} \\ g(n)+h(n) & , &\lambda=1,\text{A*} \\ g(n)+\lambda h(n) & , & \lambda>1,\text{A* Greedy} \end{aligned}\right. $$
+      
+      
+  
   * simulation:
   
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/astar.gif?raw=true)
