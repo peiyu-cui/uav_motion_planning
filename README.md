@@ -31,12 +31,30 @@ catkin_make -DCMAKE_CXX_STANDARD=14
 
     **"astar/resolution":**     astar search resolution, control the search resolution
 
-    **"astar/lambda_heu":**     $f = g(n) + lambda\_heu * h(n)$
+    **"astar/lambda_heu":**     $f = g(n) + lambda_{heu} * h(n)$
 
     **"astar/allocated_node_num":**  pre-allocated search node num, avoid too many nodes
 
-  * simulation:
+  * methods:
 
+    * tie_breaker：enhance the speed of searching
+  
+    * weighted A*: 
+      $$
+      \begin{equation}
+      f(n)=\left\{
+      \begin{aligned}
+      g(n) & , & \lambda =0,Dijkstra \\
+      g(n)+h(n) & , &\lambda=1,A* \\
+      g(n)+\lambda h(n) & , & \lambda>1,A* Greedy
+      \end{aligned}
+      \right.
+      \end{equation}
+      $$
+      
+  
+  * simulation:
+  
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/astar.gif?raw=true)
 
 ### 2. Sampling-Based Methods
@@ -48,7 +66,7 @@ catkin_make -DCMAKE_CXX_STANDARD=14
     ```shell
     source devel/setup.bash
     roslaunch plan_manage single_run_in_sim.launch
-    roslaunch test test_astar_searching.launch
+    roslaunch test test_rrt_searching.launch
     ```
 
   * parameters:
@@ -69,8 +87,11 @@ catkin_make -DCMAKE_CXX_STANDARD=14
 
   ​	**"rrt/goal_tolerance":** rrt goal tolerance, control the error between search end and real_end
 
+  * method:
+    * **kdtree-acceleration:** find nearest tree node
+  
   * simulation:
-
+  
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/rrt.gif?raw=true)
 
 
