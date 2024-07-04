@@ -41,7 +41,6 @@ catkin_make -DCMAKE_CXX_STANDARD=14
   
     * weighted A*: 
       $$
-      \begin{equation}
       f(n)=\left\{
       \begin{aligned}
       g(n) & , & \lambda =0,Dijkstra \\
@@ -49,10 +48,9 @@ catkin_make -DCMAKE_CXX_STANDARD=14
       g(n)+\lambda h(n) & , & \lambda>1,A* Greedy
       \end{aligned}
       \right.
-      \end{equation}
       $$
       
-  
+    
   * simulation:
   
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/astar.gif?raw=true)
