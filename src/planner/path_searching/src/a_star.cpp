@@ -55,7 +55,7 @@ namespace path_searching
     start_node->g_cost = 0.0;
     start_node->position = start_pt;
     start_node->parent = NULL;
-    start_node->f_cost = lambda_ * getEuclHeu(start_pt, end_pt);
+    start_node->f_cost = lambda_ * getDiagonalHeu(start_pt, end_pt);
     start_node->node_state = IN_OPEN_LIST_;
 
     open_list_.push(start_node);
@@ -121,7 +121,7 @@ namespace path_searching
               neighbor_node->g_cost = tmp_g_cost;
               neighbor_node->position = neighbor_pos;
               neighbor_node->parent = current_node;
-              neighbor_node->f_cost = neighbor_node->g_cost + lambda_ * getEuclHeu(neighbor_pos, end_pt);
+              neighbor_node->f_cost = neighbor_node->g_cost + lambda_ * getDiagonalHeu(neighbor_pos, end_pt);
               neighbor_node->node_state = IN_OPEN_LIST_;
               open_list_.push(neighbor_node);
               expanded_nodes_.insert(neighbor_node->position, neighbor_node);
@@ -134,7 +134,7 @@ namespace path_searching
             {
               tmp_node->g_cost = tmp_g_cost;
               tmp_node->parent = current_node;
-              tmp_node->f_cost = tmp_node->g_cost + lambda_ * getEuclHeu(tmp_node->position, end_pt);
+              tmp_node->f_cost = tmp_node->g_cost + lambda_ * getDiagonalHeu(tmp_node->position, end_pt);
             }
     }
 
@@ -148,6 +148,15 @@ namespace path_searching
   
   double Astar::getEuclHeu(Eigen::Vector3d x1, Eigen::Vector3d x2) {
     return tie_breaker_ * (x1 - x2).norm();
+  }
+
+  double Astar::getDiagonalHeu(Eigen::Vector3d x1, Eigen::Vector3d x2) {
+    double dx=std::abs(x1(0)- x2(0));
+    double dy=std::abs(x1(1)- x2(1));
+    double dz=std::abs(x1(2)- x2(2));
+    double min_xyz=std::min({dx,dy,dz});
+    double h=dx+dy+dz+(std::sqrt(3)-3)*min_xyz;
+    return tie_breaker_ * h;
   }
 
   // Eigen::Vector3i Astar::posToIndex(Eigen::Vector3d pos) {

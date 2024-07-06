@@ -44,10 +44,10 @@
     <param name="rrt/max_tree_node_num" value="100000"/>
     <param name="rrt/step_length" value="0.5"/>
     <param name="rrt/max_allowed_time" value="5"/>
-    <param name="rrt/goal_tolerance" value="0.2"/>
+    <param name="rrt/search_radius" value="1.0"/>
+    <param name="rrt/collision_check_resolution" value="0.1"/>
     
-    
-    
+
     <!-- local cloud lidar not use cuda-->
     <remap from="/grid_map/cloud" to="/pcl_render_node/cloud"/>
     <remap from="/grid_map/odom" to="/visual_slam/odom"/>

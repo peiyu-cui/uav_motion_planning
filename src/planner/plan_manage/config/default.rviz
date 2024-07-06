@@ -4,8 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Map1
         - /Pathsearching1
-        - /Pathsearching1/astar_path1
       Splitter Ratio: 0.5
     Tree Height: 486
   - Class: rviz/Selection
@@ -257,7 +257,7 @@ Visualization Manager:
           Marker Topic: /test_astar_searching/path
           Name: astar_path
           Namespaces:
-            astar/path: true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
@@ -280,6 +280,22 @@ Visualization Manager:
           Enabled: true
           Marker Topic: /test_rrt_searching/rrt_tree_vertices
           Name: rrt_tree_vertices
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /test_rrt_star_searching/rrt_star/path
+          Name: rrt_star_path
+          Namespaces:
+            rrt_star: true
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /test_rrt_star_searching/rrt_star/tree
+          Name: rrt_star_tree
           Namespaces:
             {}
           Queue Size: 100
@@ -316,7 +332,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 24.784770965576172
+      Distance: 28.550554275512695
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -324,17 +340,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -2.4967753887176514
-        Y: -1.768690824508667
-        Z: 0.7841696739196777
+        X: 4.451979160308838
+        Y: -2.5388095378875732
+        Z: 3.7884819507598877
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7297977805137634
+      Pitch: 0.9247969388961792
       Target Frame: <Fixed Frame>
-      Yaw: 3.155334949493408
+      Yaw: 4.680292129516602
     Saved: ~
 Window Geometry:
   Displays:
@@ -352,7 +368,7 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1386
-  X: 283
-  Y: 27
+  X: 345
+  Y: 79
   depth image:
     collapsed: false

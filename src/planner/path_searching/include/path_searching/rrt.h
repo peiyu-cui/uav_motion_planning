@@ -42,6 +42,7 @@ namespace path_searching {
       double step_length_;
       double max_allowed_time_;
       double tolerance_;
+      double search_radius_;
 
       /* main map parameters */
       GridMap::Ptr grid_map_;

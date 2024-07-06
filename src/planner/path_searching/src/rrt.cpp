@@ -6,7 +6,8 @@ namespace path_searching
     nh.param ("rrt/max_tree_node_num", max_tree_node_num_, 100000);
     nh.param ("rrt/step_length", step_length_, 0.5);
     nh.param ("rrt/max_allowed_time", max_allowed_time_, 5.0);
-    nh.param ("rrt/goal_tolerance", tolerance_, 0.1);
+    nh.param ("rrt/search_radius", search_radius_, 0.5);
+    nh.param ("rrt/collision_check_resolution", resolution_, 0.05);
     std::cout << "rrt/max_tree_node_num: " << max_tree_node_num_ << std::endl;
     std::cout << "rrt/step_length: " << step_length_ << std::endl;
   }
@@ -19,6 +20,7 @@ namespace path_searching
                          std::vector<std::pair<Eigen::Vector3d, Eigen::Vector3d>> &edges) {
     RRTPathNodePtr start_node = path_node_pool_[0];
     vertices.push_back(start_node->position);
+    // bfs to retrieve whole tree， use queue data structure
     std::queue<RRTPathNodePtr> bfs_queue;
     bfs_queue.push(start_node);
     while (!bfs_queue.empty()) {
@@ -26,6 +28,8 @@ namespace path_searching
       bfs_queue.pop();
       if (curr_node->children.empty()) continue;
       for (RRTPathNodePtr child : curr_node->children) {
+        // check if my child's child is me
+        assert(std::find(child->children.begin(), child->children.end(), curr_node) == child->children.end());
         vertices.push_back(child->position);
         edges.push_back(std::make_pair(curr_node->position, child->position));
         bfs_queue.push(child);
@@ -46,11 +50,10 @@ namespace path_searching
 
     // set up occupancy grid
     grid_map_->getRegion(origin_, map_size_);
-    resolution_ = grid_map_->getResolution();
 
     std::cout << "origin: " << origin_.transpose() << std::endl;
     std::cout << "map_size: " << map_size_.transpose() << std::endl;
-    std::cout << "resolution: " << resolution_ << std::endl;
+    std::cout << "collision_check_resolution: " << resolution_ << std::endl;
   }
 
   void RRT::reset() {
@@ -128,14 +131,14 @@ namespace path_searching
       }
       Eigen::Vector3d x_rand = getRandomNode();
       kdres* nearest_tree_node = kd_nearest(kdtree_, x_rand.data());
-      Eigen::Vector3d x_near;
-      RRTPathNodePtr nearest_node = static_cast<RRTPathNode*>(kd_res_item(nearest_tree_node, x_near.data()));
+      RRTPathNodePtr nearest_node = static_cast<RRTPathNode*>(kd_res_item_data(nearest_tree_node));
       //deallocate nearest_tree_node
       kd_res_free(nearest_tree_node);
-      nearest_node->position = x_near;
+      Eigen::Vector3d x_near = nearest_node->position;
       Eigen::Vector3d x_new = Step(x_near, x_rand, step_length_);
       // check if x_near to x_new is collision free
       if (isCollisionFree(x_near, x_new, resolution_)) {
+        // insert x_new into rrt tree
         RRTPathNodePtr x_new_node = path_node_pool_[use_node_num_];
         x_new_node->position = x_new;
         x_new_node->g_cost = nearest_node->g_cost + (x_new - x_near).norm();
@@ -144,17 +147,26 @@ namespace path_searching
         kd_insert(kdtree_, x_new.data(), x_new_node);
         use_node_num_++;
 
-        // check if reach end point
-        if (abs(x_new[0] - end_pt[0]) < tolerance_ && abs(x_new[1] - end_pt[1]) < tolerance_ && abs(x_new[2] - end_pt[2]) < tolerance_) {
-          std::cout << "reach end point" << std::endl;
-          RRTPathNodePtr end_node = x_new_node;
-          retrievePath(end_node, path);
-          ros::Time end_time = ros::Time::now();
-          double total_time = (end_time - start_time).toSec();
-          double total_cost = end_node->g_cost;
-          std::cout << "total cost: " << total_cost << std::endl;
-          std::cout << "total time: " << total_time << std::endl;
-          return REACH_END;
+        // check if x_new is close to end point
+        if ((x_new-end_pt).norm() < search_radius_) {
+          if(isCollisionFree(x_new,end_pt,resolution_))
+          {
+            RRTPathNodePtr end_node = path_node_pool_[use_node_num_];
+            use_node_num_++;
+            end_node->position = end_pt;
+            end_node->g_cost = x_new_node->g_cost + (end_pt - x_new).norm();
+            end_node->parent = x_new_node;
+            x_new_node->children.push_back(end_node);
+
+            std::cout << "reach end point" << std::endl;
+            retrievePath(end_node, path);
+            ros::Time end_time = ros::Time::now();
+            double total_time = (end_time - start_time).toSec();
+            double total_cost = end_node->g_cost;
+            std::cout << "total cost: " << total_cost << std::endl;
+            std::cout << "total time: " << total_time << std::endl;
+            return REACH_END;
+          }
         }
         else continue;
 
