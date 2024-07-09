@@ -15,21 +15,21 @@ catkin_make -DCMAKE_CXX_STANDARD=14
   * quick start:
 
     * one terminator
-  
+
     ```shell
     source devel/setup.bash
     roslaunch plan_manage single_run_in_sim.launch
     ```
-  
+
     * another terminator
-  
+
     ```shell
     source devel/setup.bash
     roslaunch test test_astar_searching.launch
     ```
-  
+
   * parameters:
-  
+
     ```xml
     <!-- astar parameters -->
     <param name="astar/resolution" value="0.1"/>
@@ -38,22 +38,63 @@ catkin_make -DCMAKE_CXX_STANDARD=14
     ```
 
     **"astar/resolution":**     astar search resolution, control the search resolution
-  
+
     **"astar/lambda_heu":**     $f = g(n) + \lambda * h(n)$
-  
+
     **"astar/allocated_node_num":**  pre-allocated search node num, avoid too many nodes
-  
+
   * methods:
-  
+
     * tie_breaker：enhance the speed of searching
-  
+
     * weighted A*: 
       
       ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/equation1.png?raw=true)
-  
+
   * simulation:
-  
+
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/astar.gif?raw=true)
+
+* Kinodynamic A*
+
+  * quick start
+
+    * one terminator
+
+    ```shell
+    source devel/setup.bash
+    roslaunch plan_manage single_run_in_sim.launch
+    ```
+
+    * another terminator
+
+    ```shell
+    source devel/setup.bash
+    roslaunch test test_kino_astar_searching.launch
+    ```
+
+  * parameters:
+
+    ```xml
+    <!-- kino_astar parameters -->
+    <param name="kino_astar/rou_time" value="10.0"/>
+    <param name="kino_astar/lambda_heu" value="5.0"/>
+    <param name="kino_astar/allocated_node_num" value="100000"/>
+    <param name="kino_astar/goal_tolerance" value="5.0"/>
+    <param name="kino_astar/time_step_size" value="0.05"/>
+    <param name="kino_astar/max_velocity" value="5.0"/>
+    <param name="kino_astar/max_accelration" value="7.0"/>
+    <param name="kino_astar/sample_tau" value="0.5"/>
+    ```
+
+  * methods:
+
+    * Paper: B. Zhou, F. Gao, L. Wang, C. Liu and S. Shen, "Robust and Efficient Quadrotor Trajectory Generation for Fast Autonomous Flight   https://arxiv.org/pdf/1907.01531
+
+  * simulation:
+
+    ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/kino_astar.gif?raw=true)
+
 
 ### 2. Sampling-Based Methods
 
@@ -133,3 +174,6 @@ catkin_make -DCMAKE_CXX_STANDARD=14
   * simulation:
 
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/rrt_star.gif?raw=true)
+
+
+

@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <Eigen/Eigen>
 #include <random>
+#include <unordered_set>
 #include <visualization_msgs/Marker.h>
 
 #include <kdtree/kdtree.h>
@@ -40,14 +41,15 @@ class RRTStar {
     double step_length_;
     double search_radius_;
     double tolerance_;
+    double max_tolerance_time_;
     bool reach_goal_;
-    RRTStarNodePtr goal_node_;
 
     /* main map parameters */
     GridMap::Ptr grid_map_;
     Eigen::Vector3d origin_;
     Eigen::Vector3d map_size_;
     double resolution_;
+
 
     /* main ros publishers and subscribers */
     ros::Publisher vis_path_pub_;
@@ -64,7 +66,7 @@ class RRTStar {
     Eigen::Vector3d getRandomNode();
     Eigen::Vector3d Step(Eigen::Vector3d from, Eigen::Vector3d to, double step_length);
     bool isCollisionFree(Eigen::Vector3d from, Eigen::Vector3d to, double map_resolution);
-    bool ChooseParent(kdres* &x_new_neighbors, RRTStarNodePtr& new_node);
+    RRTStarNodePtr ChooseParent(Eigen::Vector3d x_new);
     void ReWireTree(RRTStarNodePtr& new_node);
     void retrievePath(RRTStarNodePtr end_node, std::vector<Eigen::Vector3d>& path);
     void visFeasiblePath(std::vector<Eigen::Vector3d> path);

@@ -48,7 +48,9 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_library(path_searching
   src/a_star.cpp
   src/rrt.cpp
-  src/rrt_star.cpp)
+  src/rrt_star.cpp
+  src/kino_astar.cpp
+  src/kino_rrt_star.cpp)
 
 target_link_libraries(path_searching
   ${catkin_LIBRARYS}

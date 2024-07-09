@@ -289,7 +289,7 @@ Visualization Manager:
           Marker Topic: /test_rrt_star_searching/rrt_star/path
           Name: rrt_star_path
           Namespaces:
-            rrt_star: true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
@@ -298,6 +298,14 @@ Visualization Manager:
           Name: rrt_star_tree
           Namespaces:
             {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /test_kino_astar_searching/kino_astar/path
+          Name: kino_astar_path
+          Namespaces:
+            astar/path: true
           Queue Size: 100
           Value: true
       Enabled: true
@@ -332,7 +340,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 28.550554275512695
+      Distance: 22.10955047607422
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -340,17 +348,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 4.451979160308838
-        Y: -2.5388095378875732
-        Z: 3.7884819507598877
+        X: 1.0077989101409912
+        Y: -2.7355637550354004
+        Z: 2.4092400074005127
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9247969388961792
+      Pitch: 0.9847970008850098
       Target Frame: <Fixed Frame>
-      Yaw: 4.680292129516602
+      Yaw: 4.730292797088623
     Saved: ~
 Window Geometry:
   Displays:
@@ -369,6 +377,6 @@ Window Geometry:
     collapsed: false
   Width: 1386
   X: 345
-  Y: 79
+  Y: 42
   depth image:
     collapsed: false

@@ -42,9 +42,11 @@
 
     <!-- rrt_star parameters -->
     <param name="rrt_star/max_tree_node_num" value="100000"/>
-    <param name="rrt_star/step_length" value="0.5"/>
+    <param name="rrt_star/step_length" value="1.0"/>
     <param name="rrt_star/collision_check_resolution" value="0.1"/>
-    <param name="rrt_star/search_radius" value="1.0"/>
+    <param name="rrt_star/search_radius" value="1.5"/>
+    <param name="rrt_star/max_tolerance_time" value="6.0"/>
+    
 
     <!-- local cloud lidar not use cuda-->
     <remap from="/grid_map/cloud" to="/pcl_render_node/cloud"/>

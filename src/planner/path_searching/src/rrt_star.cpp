@@ -9,6 +9,7 @@ void RRTStar::setParam(ros::NodeHandle& nh)
   nh.param("rrt_star/step_length", step_length_, 0.5);
   nh.param("rrt_star/search_radius", search_radius_, 0.5);
   nh.param("rrt_star/collision_check_resolution", resolution_, 0.05);
+  nh.param("rrt_star/max_tolerance_time", max_tolerance_time_, 2.0);
 
   vis_path_pub_ = nh.advertise<visualization_msgs::Marker>("rrt_star/path", 1);
   vis_path_marker_.header.frame_id = "world";
@@ -32,14 +33,13 @@ void RRTStar::setParam(ros::NodeHandle& nh)
   vis_tree_marker_.type = visualization_msgs::Marker::LINE_LIST;
   vis_tree_marker_.action = visualization_msgs::Marker::ADD;
   vis_tree_marker_.pose.orientation.w = 1.0;
-  vis_tree_marker_.scale.x = 0.05;
-  vis_tree_marker_.scale.y = 0.05;
-  vis_tree_marker_.scale.z = 0.05;
+  vis_tree_marker_.scale.x = 0.03;
+  vis_tree_marker_.scale.y = 0.03;
+  vis_tree_marker_.scale.z = 0.03;
   vis_tree_marker_.color.a = 1.0;
   vis_tree_marker_.color.r = 0.0;
   vis_tree_marker_.color.g = 1.0;
   vis_tree_marker_.color.b = 0.0;
-
 }
 
 
@@ -61,13 +61,12 @@ void RRTStar::init()
 
   use_node_num_ = 0;
   reach_goal_ = false;
-  goal_node_ = NULL;
 
   grid_map_->getRegion(origin_, map_size_);
 
   std::cout << "origin: " << origin_.transpose() << std::endl;
   std::cout << "map_size: " << map_size_.transpose() << std::endl;
-  std::cout << "resolution: " << resolution_ << std::endl;
+  std::cout << "collision_check_resolution: " << resolution_ << std::endl;
 }
 
 
@@ -75,7 +74,6 @@ void RRTStar::reset()
 {
   kd_clear(kdtree_);
   use_node_num_ = 0;
-  goal_node_ = NULL;
   reach_goal_ = false;
 
   for (int i = 0; i < max_tree_node_num_; i++)
@@ -120,19 +118,22 @@ bool RRTStar::isCollisionFree(Eigen::Vector3d from, Eigen::Vector3d to, double m
   return true;
 }
 
-bool RRTStar::ChooseParent(kdres* &x_new_neighbors, RRTStarNodePtr& new_node)
+RRTStarNodePtr RRTStar::ChooseParent(Eigen::Vector3d x_new)
 {
+  kdres* x_new_neighbors = kd_nearest_range(kdtree_, x_new.data(), search_radius_);
   double compare_cost = inf;
+  RRTStarNodePtr parent_node = NULL;
   while (!kd_res_end(x_new_neighbors))
    {
     RRTStarNodePtr x_new_neighbor = static_cast<RRTStarNodePtr>(kd_res_item_data(x_new_neighbors));
-    double g_cost_new = x_new_neighbor->g_cost + (x_new_neighbor->position - new_node->position).norm();
-    if (g_cost_new < compare_cost && isCollisionFree(x_new_neighbor->position, new_node->position, resolution_))
+    double g_cost_new = x_new_neighbor->g_cost + (x_new_neighbor->position - x_new).norm();
+    if (g_cost_new < compare_cost && isCollisionFree(x_new_neighbor->position, x_new, resolution_))
     {
       compare_cost = g_cost_new;
-      new_node->parent = x_new_neighbor;
+      parent_node = x_new_neighbor;
+      // new_node->parent = x_new_neighbor;
       // x_new_neighbor->children.push_back(new_node); // fatal error here when traversing the search tree, has been fixed
-      new_node->g_cost = g_cost_new;
+      // new_node->g_cost = g_cost_new;
     }
     kd_res_next(x_new_neighbors);
    }
@@ -140,15 +141,19 @@ bool RRTStar::ChooseParent(kdres* &x_new_neighbors, RRTStarNodePtr& new_node)
   if (compare_cost == inf)
   {
     kd_res_free(x_new_neighbors);
-    return false;
-  } 
+    return NULL;
+  }
   else
   {
-    new_node->parent->children.push_back(new_node);
+    RRTStarNodePtr new_node = path_node_pool_[use_node_num_];
+    new_node->position = x_new;
+    new_node->parent = parent_node;
+    new_node->g_cost = compare_cost;
+    parent_node->children.push_back(new_node);
+    use_node_num_++;
     kd_res_free(x_new_neighbors);
-    return true;
+    return new_node;
   }
-
 }
 
 void RRTStar::ReWireTree(RRTStarNodePtr& new_node)
@@ -160,18 +165,43 @@ void RRTStar::ReWireTree(RRTStarNodePtr& new_node)
     double g_cost_new = new_node->g_cost + (x_new_neighbor->position - new_node->position).norm();
     if (g_cost_new < x_new_neighbor->g_cost && 
         isCollisionFree(new_node->position, x_new_neighbor->position, resolution_))
-    {
-      std::vector<RRTStarNodePtr> p_children = x_new_neighbor->parent->children;
-      auto it = std::remove(p_children.begin(), p_children.end(), x_new_neighbor);
-      p_children.erase(it, p_children.end());
-      x_new_neighbor->parent = new_node;
-      x_new_neighbor->g_cost = g_cost_new;
-      new_node->children.push_back(x_new_neighbor);
-    }
-    kd_res_next(x_new_neighbors);
+        {
+          // fatal error here when rewire tree, has been fixed
+          // error reason: only change p_children, not update old_parent's children list
+          //need to change old_parent->children, need to operate pointer, not vector
+
+          // std::vector<RRTStarNodePtr> p_children = x_new_neighbor->parent->children;
+          // auto it = std::remove(p_children.begin(), p_children.end(), x_new_neighbor);
+          // p_children.erase(it, p_children.end());
+
+          // remove x_new_neighbor from its old parent's children list
+          RRTStarNodePtr old_parent = x_new_neighbor->parent;
+          auto it = std::remove(old_parent->children.begin(), old_parent->children.end(), x_new_neighbor);
+          old_parent->children.erase(it, old_parent->children.end());
+          x_new_neighbor->parent = new_node;
+          x_new_neighbor->g_cost = g_cost_new;
+          new_node->children.push_back(x_new_neighbor);
+
+          // update x_new_neighbor's descendants' g_cost
+          std::queue<RRTStarNodePtr> bfs_queue;
+          bfs_queue.push(x_new_neighbor);
+          while (!bfs_queue.empty())
+          {
+            RRTStarNodePtr curr_node = bfs_queue.front();
+            bfs_queue.pop();
+            for (RRTStarNodePtr child : curr_node->children)
+            {
+              double g_cost_new_child = curr_node->g_cost + (child->position - curr_node->position).norm();
+              child->g_cost = g_cost_new_child;
+              bfs_queue.push(child);
+            }
+          }
+        }
+        kd_res_next(x_new_neighbors);
   }
   kd_res_free(x_new_neighbors);
 }
+
 
 void RRTStar::retrievePath(RRTStarNodePtr end_node, std::vector<Eigen::Vector3d>& path)
 {
@@ -212,7 +242,7 @@ void RRTStar::getWholeTree(std::vector<Eigen::Vector3d> &vertices,
     if (curr_node->children.empty()) continue;
     for (RRTStarNodePtr child : curr_node->children) {
       // check if my child's child is me
-      // assert(std::find(child->children.begin(), child->children.end(), curr_node) == child->children.end());
+      assert(std::find(child->children.begin(), child->children.end(), curr_node) == child->children.end());
       vertices.push_back(child->position);
       edges.push_back(std::make_pair(curr_node->position, child->position));
       bfs_queue.push(child);
@@ -244,23 +274,6 @@ void RRTStar::visWholeTree(std::vector<Eigen::Vector3d> vertices,
   vis_tree_pub_.publish(vis_tree_marker_);
 }
 
-RRTStarNodePtr RRTStar::getMinCostNode(kdres* &x_end_neighbors)
-{
-  double min_cost = inf;
-  RRTStarNodePtr min_cost_node;
-  while (!kd_res_end(x_end_neighbors))
-  {
-    RRTStarNodePtr tmp_node = static_cast<RRTStarNodePtr>(kd_res_item_data(x_end_neighbors));
-    if (tmp_node->g_cost + (tmp_node->position - goal_node_->position).norm() < min_cost && isCollisionFree(tmp_node->position, goal_node_->position, resolution_))
-    {
-      min_cost = tmp_node->g_cost + (tmp_node->position - goal_node_->position).norm();
-      min_cost_node = tmp_node;
-    }
-    kd_res_next(x_end_neighbors);
-  }
-  kd_res_free(x_end_neighbors);
-  return min_cost_node;
-}
 
 int RRTStar::search(Eigen::Vector3d start, Eigen::Vector3d end, std::vector<Eigen::Vector3d>& path)
 {
@@ -296,21 +309,18 @@ int RRTStar::search(Eigen::Vector3d start, Eigen::Vector3d end, std::vector<Eige
 
     if(grid_map_->getInflateOccupancy(x_new) != true)
     {
-      kdres* x_new_neighbors = kd_nearest_range(kdtree_, x_new.data(), search_radius_);
-      RRTStarNodePtr new_node = path_node_pool_[use_node_num_];
-      new_node->position = x_new;
-      use_node_num_++;
-      if (ChooseParent(x_new_neighbors, new_node))
+      RRTStarNodePtr new_node = ChooseParent(x_new);
+      if (new_node != NULL)
       {
         kd_insert(kdtree_, new_node->position.data(), new_node);
-        // rewire the local rrt_star tree
         ReWireTree(new_node);
- 
-        if((new_node->position-end).norm() <= search_radius_ )
+        // check if new_node is close to the goal
+        if((new_node->position-end).norm() <= search_radius_)
         {
-          if(reach_goal_ == false)
+
+          if(isCollisionFree(new_node->position, end, resolution_))
           {
-            if(isCollisionFree(new_node->position, end, resolution_))
+            if(reach_goal_ == false)
             {
               ros::Time first_end_time = ros::Time::now();
               reach_goal_ = true;
@@ -319,70 +329,58 @@ int RRTStar::search(Eigen::Vector3d start, Eigen::Vector3d end, std::vector<Eige
 
               new_node->children.push_back(global_goal_node);
               global_goal_node->parent = new_node;
-              global_goal_node->g_cost = new_node->g_cost + (global_goal_node->position - new_node->position).norm();
-              goal_node_ = global_goal_node;
+              global_goal_node->g_cost = new_node->g_cost + (end - new_node->position).norm();
               feasible_cost_ = global_goal_node->g_cost;
               retrievePath(global_goal_node, path);
               visFeasiblePath(path);
               path.clear();
-              getWholeTree(vertices, edges);
-              visWholeTree(vertices, edges);
+
               vertices.clear();
               edges.clear();
+              getWholeTree(vertices, edges);
+              visWholeTree(vertices, edges);
+
+              // return REACH_END;
             }
-            else continue;
-
+            else
+            {
+              if(new_node->g_cost + (end - new_node->position).norm() < feasible_cost_)
+              {
+                global_goal_node->parent = new_node;
+                new_node->children.push_back(global_goal_node);
+                global_goal_node->g_cost = new_node->g_cost + (end - new_node->position).norm();
+              }
+            }
           }
-
-          // only when x_new is close to the goal, check if it has a better path to the goal
-          // bool has_better_path = new_node->g_cost + (new_node->position - end).norm() < feasible_cost_;
-          // if(isCollisionFree(new_node->position, end, resolution_) && has_better_path) 
-          // {
-          //   feasible_cost_ = new_node->g_cost + (new_node->position - end).norm();
-          //   std::cout << "path cost: " << feasible_cost_ << std::endl;
-          //   RRTStarNodePtr end_node = global_goal_node;
-          //   end_node->g_cost = new_node->g_cost + (end_node->position - new_node->position).norm();
-          //   end_node->parent = new_node;
-          //   bool not_exist_child = std::find(new_node->children.begin(), new_node->children.end(), end_node) != new_node->children.end();
-          //   if (not_exist_child)
-          //   {
-          //     new_node->children.push_back(end_node);
-          //   }
-            
-          //   retrievePath(end_node, path);
-          //   visFeasiblePath(path);
-          //   // getWholeTree(vertices, edges);
-          //   // visWholeTree(vertices, edges);
-          //   path.clear();
-          //   // vertices.clear();
-          //   // edges.clear();
-          // }
-
+          else continue;
         }
 
         if (reach_goal_)
         {
-
-          kdres* x_end_neighbors = kd_nearest_range(kdtree_, global_goal_node->position.data(), search_radius_);
-          RRTStarNodePtr min_end_neibor = getMinCostNode(x_end_neighbors);
-          tmp_cost = min_end_neibor->g_cost + (min_end_neibor->position - global_goal_node->position).norm();
-
+          tmp_cost = global_goal_node->g_cost;
           if (tmp_cost < feasible_cost_)
           {
-            global_goal_node->parent = min_end_neibor;
-            min_end_neibor->children.push_back(global_goal_node);
-            global_goal_node->g_cost = tmp_cost;
-
-            std::cout << "path cost: " << tmp_cost << std::endl;
+            std::cout << "better path cost: " << tmp_cost << std::endl;
             feasible_cost_ = tmp_cost;
 
-            retrievePath(goal_node_, path);
+            retrievePath(global_goal_node, path);
             visFeasiblePath(path);
             path.clear();
 
+            vertices.clear();
+            edges.clear();
+
+            getWholeTree(vertices, edges);
+            visWholeTree(vertices, edges);
+
+          }
+          ros::Time end_time = ros::Time::now();
+          if((end_time - start_time).toSec() >= max_tolerance_time_)
+          {
+            std::cout << "reach max tolerance time, find asymptotic Optimal path!" << std::endl;
+            return REACH_END;
           }
 
-          // std::cout << "find a feasible path!" << std::endl;
         }
 
       }
@@ -394,7 +392,7 @@ int RRTStar::search(Eigen::Vector3d start, Eigen::Vector3d end, std::vector<Eige
 
   if (reach_goal_)
   {
-    std::cout << "find a asymptotic Optimal path!" << std::endl;
+    std::cout << "reach max tree node num, find a asymptotic Optimal path!" << std::endl;
     return REACH_END;
   }
   else
