@@ -5,10 +5,19 @@
 #include <Eigen/Eigen>
 #include <queue>
 #include <unordered_map>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <boost/make_shared.hpp>
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
 #include <plan_env/grid_map.h>
+
 namespace path_searching
 {
+
+typedef pcl::PointXYZ PCLPoint;
+typedef pcl::PointCloud<PCLPoint> PCLPointCloud;
+typedef pcl::KdTreeFLANN<PCLPoint> KdTree;
 
 #define inf (1 << 30);
 #define IN_OPEN_LIST_   'a';
@@ -46,7 +55,7 @@ typedef KinoAstarNode* KinoAstarNodePtr;
 class KinoAstarNodeComparator
 {
   public:
-    bool operator() (const KinoAstarNodePtr& node1, const KinoAstarNodePtr& node2) const
+    bool operator() (KinoAstarNodePtr node1, KinoAstarNodePtr node2)
     {
       return node1->f_cost > node2->f_cost;
     }
@@ -115,10 +124,12 @@ class KinoAstar
     KinoAstarNodeHashTable close_list_;
     KinoAstarNodeHashTable expanded_list_;
     std::vector<KinoAstarNodePtr> path_node_pool_;
+    std::vector<Eigen::Matrix3d> rot_list;
 
     /* main search parameters */
     int allocated_node_num_;
     int use_node_num_;
+    int collision_check_type_;
     double acc_res_;
     double rou_;
     double lambda_heu_;
@@ -133,17 +144,31 @@ class KinoAstar
     Eigen::Matrix<double, 3, 4> vel_coef_;
     Eigen::Matrix<double, 3, 4> acc_coef_;
 
+    /* main robot parameters */
+    double robot_r_;
+    double robot_h_;
+
+    /* main visulization parameters */
+    ros::Publisher path_node_pub_;
+    visualization_msgs::Marker path_node_marker_;
+
+    ros::Publisher elliposid_pub_;
+
     enum {
       REACH_END = 1,
       NO_PATH_FOUND = 2
     };
 
-    /* mian map parameters */
+    /* mian map parameters: grid map */
     Eigen::Vector3d origin_;
     Eigen::Vector3d map_size_;
     double resolution_;
     double inv_resolution_;
     GridMap::Ptr grid_map_;
+    /* main map parameters: cloud map */
+    std::vector<Eigen::Vector3d> obs_;
+    KdTree kdtree_;
+    ros::Subscriber local_cloud_sub_;
 
     /* main helper functions */
     Eigen::Vector3i posToIndex(Eigen::Vector3d pos);
@@ -155,21 +180,29 @@ class KinoAstar
     bool computeShotTraj(Eigen::Vector3d x1, Eigen::Vector3d v1,
                             Eigen::Vector3d x2, Eigen::Vector3d v2,
                             double optimal_time);
-    std::vector<KinoAstarNodePtr> retrievePath(KinoAstarNodePtr end_node);
+    std::vector<KinoAstarNodePtr> retrievePath(KinoAstarNodePtr end_node, std::vector<Eigen::Vector3d>& path_nodes_list);
     void samplePath(std::vector<KinoAstarNodePtr> path_pool, std::vector<Eigen::Vector3d>& path);
+    void sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::vector<Eigen::Vector3d>& path,
+                         std::vector<Eigen::Matrix3d> &rot_list);
     void StateTransit(Eigen::Matrix<double, 6, 1> &x0, Eigen::Matrix<double, 6, 1> &xt, Eigen::Vector3d ut, double dt);
 
-
+    /* main se3 helper functions */
+    void localCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg);
+    bool isCollisionFree(Eigen::Vector3d pt, Eigen::Vector3d acc);
+    PCLPointCloud toPCL(const std::vector<Eigen::Vector3d>& obs);
 
   public:
     void setParam(ros::NodeHandle& nh);
     void init();
     void setGridMap(GridMap::Ptr& grid_map);
     // second-order interator model 
+    // acceleration-controller motion planning
     int search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
          Eigen::Vector3d end_pt, Eigen::Vector3d end_vel,
          std::vector<Eigen::Vector3d>& path);
     void reset();
+    void visPathNodes(std::vector<Eigen::Vector3d>& path_nodes_list);
+    void visEllipsoid(std::vector<Eigen::Vector3d>& path_nodes_list, std::vector<Eigen::Matrix3d> &rot_list);
 
     KinoAstar() {};
     ~KinoAstar();

@@ -16,6 +16,7 @@ find_package(PCL 1.7 REQUIRED)
 
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 
 set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 
@@ -50,7 +51,7 @@ add_library(path_searching
   src/rrt.cpp
   src/rrt_star.cpp
   src/kino_astar.cpp
-  src/kino_rrt_star.cpp)
+  src/kino_se3.cpp)
 
 target_link_libraries(path_searching
   ${catkin_LIBRARYS}

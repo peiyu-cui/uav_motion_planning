@@ -17,9 +17,9 @@ int main(int argc, char** argv) {
   cout << "Grid map set" << endl;
   kino_astar_->init();
   cout << "RRT initialized" << endl;
-  Eigen::Vector3d start_pt(0, 0, 0.1);
-  Eigen::Vector3d start_vel(0, 0, 0);
-  Eigen::Vector3d end_pt(5, 5, 1);
+  Eigen::Vector3d start_pt(0, 0, 1.0);
+  Eigen::Vector3d start_vel(1, 1, 0);
+  Eigen::Vector3d end_pt(5, 5, 0.8);
   Eigen::Vector3d end_vel(0, 0, 0);
   std::vector<Eigen::Vector3d> path;
   kino_astar_->search(start_pt, start_vel, end_pt, end_vel, path);

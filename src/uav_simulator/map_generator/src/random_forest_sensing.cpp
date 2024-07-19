@@ -235,8 +235,8 @@ void FixMapgenerate() {
     }
     case 1:
     {
-      GenerateWall(3.0, 4.0, 0.5, 10.0, -0.5, 5.0, cloudMap);
-      GenerateWall(3.0, 4.0, -10.0, -0.5, -0.5, 5.0, cloudMap);
+      GenerateWall(3.0, 4.0, 0.3, 10.0, -0.5, 5.0, cloudMap);
+      GenerateWall(3.0, 4.0, -10.0, -0.3, -0.5, 5.0, cloudMap);
       break;
     }
     case 2:
@@ -331,8 +331,8 @@ int main(int argc, char** argv) {
 
   ros::Duration(0.5).sleep();
 
-  RandomMapGenerate();
-  // FixMapgenerate();
+  // RandomMapGenerate();
+  FixMapgenerate();
 
   ros::Rate loop_rate(_sense_rate);
 

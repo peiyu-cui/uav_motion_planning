@@ -3,7 +3,7 @@
 ## Quick start
 
 ```shell
-git clone git@github.com:peiyu-cui/motion-planning.git
+git clone https://github.com/peiyu-cui/motion-planning.git
 cd motion-planning
 catkin_make -DCMAKE_CXX_STANDARD=14
 ```
@@ -73,27 +73,89 @@ catkin_make -DCMAKE_CXX_STANDARD=14
   roslaunch test test_kino_astar_searching.launch
   ```
 
-* parameters:
+* parameters:(**need some parameters to change!!!)**
+
+  * kino_astar/collision_check_type = 1 : **kino_astar planning**
+  * kino_astar/collision_check_type = 2 : **kino_se(3) planning**
+  * **(map_type change)** simulator.xml : "map/fix_map_type" = 0 : generate random map
+  * **(map_type change) **simulator.xml : "map/fix_map_type" = 1 : generate fix wall map
 
   ```xml
-  <!-- kino_astar parameters -->
-  <param name="kino_astar/rou_time" value="10.0"/>
-  <param name="kino_astar/lambda_heu" value="5.0"/>
+   <!-- kino_astar parameters -->
+  <param name="kino_astar/rou_time" value="20.0"/>
+  <param name="kino_astar/lambda_heu" value="3.0"/>
   <param name="kino_astar/allocated_node_num" value="100000"/>
-  <param name="kino_astar/goal_tolerance" value="5.0"/>
-  <param name="kino_astar/time_step_size" value="0.05"/>
-  <param name="kino_astar/max_velocity" value="5.0"/>
-  <param name="kino_astar/max_accelration" value="7.0"/>
-  <param name="kino_astar/sample_tau" value="0.5"/>
+  <param name="kino_astar/goal_tolerance" value="2.0"/>
+  <param name="kino_astar/time_step_size" value="0.075"/>
+  <param name="kino_astar/max_velocity" value="7.0"/>
+  <param name="kino_astar/max_accelration" value="10.0"/>
+  <param name="kino_astar/acc_resolution" value="4.0"/>
+  <param name="kino_astar/sample_tau" value="0.3"/>
+  <!-- collision check type 1: kino_astar, 2: kino_se3 -->
+  <param name="kino_astar/collision_check_type" value="2"/>
+  <!-- robot ellipsoid parameters -->
+  <param name="kino_se3/robot_r" value="0.4"/>
+  <param name="kino_se3/robot_h" value="0.1"/>
   ```
 
 * methods:
 
-  * **Paper:** B. Zhou, F. Gao, L. Wang, C. Liu and S. Shen, "Robust and Efficient Quadrotor Trajectory Generation for Fast Autonomous Flight   https://arxiv.org/pdf/1907.01531
+  * **Paper:** B. Zhou, F. Gao, L. Wang, C. Liu and S. Shen, ["Robust and Efficient Quadrotor Trajectory Generation for Fast Autonomous Flight](https://arxiv.org/pdf/1907.01531)   
 
 * simulation:
 
   ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/kino_astar.gif?raw=true)
+
+#### (3) SE(3) Planning
+
+* quick start
+
+  * one terminator
+
+  ```shell
+  source devel/setup.bash
+  roslaunch plan_manage single_run_in_sim.launch
+  ```
+
+  * another terminator
+
+  ```shell
+  source devel/setup.bash
+  roslaunch test test_kino_astar_searching.launch
+  ```
+
+* parameters(**need some parameters to change!!!!**):
+
+  * "kino_astar/collision_check_type" = 1 : **kino_astar planning**
+  * "kino_astar/collision_check_type" = 2 : **kino_se(3) planning**
+  * **(map_type change)** simulator.xml : "map/fix_map_type" = 0 : generate random map
+  * **(map_type change) **simulator.xml : "map/fix_map_type" = 1 : generate fix wall map
+
+  ```xml
+  <!-- kino_astar parameters -->
+  <param name="kino_astar/rou_time" value="20.0"/>
+  <param name="kino_astar/lambda_heu" value="3.0"/>
+  <param name="kino_astar/allocated_node_num" value="100000"/>
+  <param name="kino_astar/goal_tolerance" value="2.0"/>
+  <param name="kino_astar/time_step_size" value="0.075"/>
+  <param name="kino_astar/max_velocity" value="7.0"/>
+  <param name="kino_astar/max_accelration" value="10.0"/>
+  <param name="kino_astar/acc_resolution" value="4.0"/>
+  <param name="kino_astar/sample_tau" value="0.3"/>
+  <!-- collision check type 1: kino_astar, 2: kino_se3 -->
+  <param name="kino_astar/collision_check_type" value="2"/>
+  <!-- robot ellipsoid parameters -->
+  <param name="kino_se3/robot_r" value="0.4"/>
+  <param name="kino_se3/robot_h" value="0.1"/>
+  ```
+
+* methods:
+
+  * **Paper:** S. Liu, K. Mohta, N. Atanasov, and V. Kumar, [“Search-based motion planning for aggressive flight in SE(3)”](https://arxiv.org/pdf/1710.02748)
+
+* simulation:
+
+  ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/kino_se3.gif?raw=true)
 
 ### 2. Sampling-Based Methods
 

@@ -106,7 +106,7 @@ struct MappingData {
 
   bool occ_need_update_, local_updated_;
   bool has_first_depth_;
-  bool has_odom_, has_cloud_;
+  bool has_odom_, has_cloud_, has_local_cloud_;
 
   // depth image projected point cloud
 
@@ -190,6 +190,7 @@ private:
                          const geometry_msgs::PoseStampedConstPtr& pose);
   void depthOdomCallback(const sensor_msgs::ImageConstPtr& img, const nav_msgs::OdometryConstPtr& odom);
   void cloudCallback(const sensor_msgs::PointCloud2ConstPtr& img);
+  void localCloudCallback(const sensor_msgs::PointCloud2ConstPtr& img);
   void odomCallback(const nav_msgs::OdometryConstPtr& odom);
 
   // update occupancy by raycasting

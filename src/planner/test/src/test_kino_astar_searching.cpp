@@ -36,7 +36,7 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     path_marker.header.frame_id = "world";
     path_marker.header.stamp = ros::Time::now();
 
-    path_marker.ns = "astar/path";
+    path_marker.ns = "kino_astar/path";
     path_marker.id = 0;
 
     path_marker.type = visualization_msgs::Marker::LINE_STRIP;

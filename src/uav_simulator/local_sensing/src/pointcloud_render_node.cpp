@@ -105,7 +105,7 @@ void renderSensedPoints(const ros::TimerEvent& event) {
   q.w() = _odom.pose.pose.orientation.w;
 
   Eigen::Matrix3d rot;
-  rot = q;
+  rot = q.toRotationMatrix();
   Eigen::Vector3d yaw_vec = rot.col(0);
 
   _local_map.points.clear();
@@ -121,11 +121,11 @@ void renderSensedPoints(const ros::TimerEvent& event) {
                                    _pointRadiusSquaredDistance) > 0) {
     for (size_t i = 0; i < _pointIdxRadiusSearch.size(); ++i) {
       pt = _cloud_all_map.points[_pointIdxRadiusSearch[i]];
-
+      // default sensing angle is +-15 degree
       if ((fabs(pt.z - _odom.pose.pose.position.z) / (sensing_horizon)) >
           tan(M_PI / 12.0))
         continue;
-
+      // check if the point is behind the robot
       Vector3d pt_vec(pt.x - _odom.pose.pose.position.x,
                       pt.y - _odom.pose.pose.position.y,
                       pt.z - _odom.pose.pose.position.z);
@@ -147,6 +147,50 @@ void renderSensedPoints(const ros::TimerEvent& event) {
 
   pub_cloud.publish(_local_map_pcd);
 }
+
+
+// void renderLocalPoints(const ros::TimerEvent& event)
+// {
+//   if (!has_global_map || !has_odom) return;
+
+//   Eigen::Quaterniond q;
+//   q.x() = _odom.pose.pose.orientation.x;
+//   q.y() = _odom.pose.pose.orientation.y;
+//   q.z() = _odom.pose.pose.orientation.z;
+//   q.w() = _odom.pose.pose.orientation.w;
+
+//   _local_map.points.clear();
+//   pcl::PointXYZ searchPoint(_odom.pose.pose.position.x,
+//                             _odom.pose.pose.position.y,
+//                             _odom.pose.pose.position.z);
+//   _pointIdxRadiusSearch.clear();
+//   _pointRadiusSquaredDistance.clear();
+
+//   pcl::PointXYZ pt;
+//   if (_kdtreeLocalMap.radiusSearch(searchPoint, sensing_horizon,
+//                                    _pointIdxRadiusSearch,
+//                                    _pointRadiusSquaredDistance) > 0) {
+//     for (size_t i = 0; i < _pointIdxRadiusSearch.size(); ++i) {
+//       pt = _cloud_all_map.points[_pointIdxRadiusSearch[i]];
+
+//       _local_map.points.push_back(pt);
+//     }
+//   }
+//   else {
+//     return;
+//   }
+
+//   _local_map.width = _local_map.points.size();
+//   _local_map.height = 1;
+//   _local_map.is_dense = true;
+
+//   pcl::toROSMsg(_local_map, _local_map_pcd);
+//   _local_map_pcd.header.frame_id = "world";
+
+//   pub_cloud.publish(_local_map_pcd);
+
+// }
+
 
 void rcvLocalPointCloudCallBack(
     const sensor_msgs::PointCloud2& pointcloud_map) {
@@ -183,6 +227,9 @@ int main(int argc, char** argv) {
   // need odometry to get the current position of the robot
   local_sensing_timer =
       nh.createTimer(ros::Duration(sensing_duration), renderSensedPoints);
+  // local_sensing_timer =
+  //     nh.createTimer(ros::Duration(sensing_duration), renderLocalPoints);
+
 
   _inv_resolution = 1.0 / _resolution;
 

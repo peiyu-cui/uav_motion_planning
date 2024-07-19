@@ -4,11 +4,11 @@
   <node name="test_rrt_star_searching" pkg="test" type="test_rrt_star_searching" output="screen">
     <param name="grid_map/resolution" value="0.1"/>
     <param name="grid_map/map_size_x"   value="40.0" /> 
-    <param name="grid_map/map_size_y"   value="40.0" /> 
-    <param name="grid_map/map_size_z"   value="5.0" /> 
+    <param name="grid_map/map_size_y"   value="20.0" /> 
+    <param name="grid_map/map_size_z"   value="3.0" /> 
     <param name="grid_map/local_update_range_x"  value="40.0" /> 
-    <param name="grid_map/local_update_range_y"  value="40.0" /> 
-    <param name="grid_map/local_update_range_z"  value="5.0" /> 
+    <param name="grid_map/local_update_range_y"  value="20.0" /> 
+    <param name="grid_map/local_update_range_z"  value="3.0" /> 
     <param name="grid_map/obstacles_inflation"     value="0.099" /> 
     <param name="grid_map/local_map_margin" value="30"/>
     <param name="grid_map/ground_height"        value="-0.01"/>
@@ -45,7 +45,7 @@
     <param name="rrt_star/step_length" value="1.0"/>
     <param name="rrt_star/collision_check_resolution" value="0.1"/>
     <param name="rrt_star/search_radius" value="1.5"/>
-    <param name="rrt_star/max_tolerance_time" value="6.0"/>
+    <param name="rrt_star/max_tolerance_time" value="1.0"/>
     
 
     <!-- local cloud lidar not use cuda-->

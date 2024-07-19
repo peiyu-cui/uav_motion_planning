@@ -33,12 +33,12 @@ void RRTStar::setParam(ros::NodeHandle& nh)
   vis_tree_marker_.type = visualization_msgs::Marker::LINE_LIST;
   vis_tree_marker_.action = visualization_msgs::Marker::ADD;
   vis_tree_marker_.pose.orientation.w = 1.0;
-  vis_tree_marker_.scale.x = 0.03;
-  vis_tree_marker_.scale.y = 0.03;
-  vis_tree_marker_.scale.z = 0.03;
+  vis_tree_marker_.scale.x = 0.01;
+  vis_tree_marker_.scale.y = 0.01;
+  vis_tree_marker_.scale.z = 0.01;
   vis_tree_marker_.color.a = 1.0;
   vis_tree_marker_.color.r = 0.0;
-  vis_tree_marker_.color.g = 1.0;
+  vis_tree_marker_.color.g = 0.8;
   vis_tree_marker_.color.b = 0.0;
 }
 

@@ -829,7 +829,6 @@ void GridMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img)
 
 
 
-
 void GridMap::publishMap()
 {
 
