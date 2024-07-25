@@ -13,19 +13,20 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES traj_optimization
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
 
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
+  ${Eigen3_INCLUDE_DIRS}
 )
 
 add_library(traj_optimization
-  src/minimum_jerk.cpp)
+  src/minimum_control.cpp)
 
 target_link_libraries(traj_optimization
   ${catkin_LIBRARIES}

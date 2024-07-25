@@ -41,7 +41,7 @@
     <param name="grid_map/frame_id"      value="world"/>
 
     <!-- kino_astar parameters -->
-    <param name="kino_astar/rou_time" value="20.0"/>
+    <param name="kino_astar/rou_time" value="50.0"/>
     <param name="kino_astar/lambda_heu" value="3.0"/>
     <param name="kino_astar/allocated_node_num" value="100000"/>
     <param name="kino_astar/goal_tolerance" value="2.0"/>

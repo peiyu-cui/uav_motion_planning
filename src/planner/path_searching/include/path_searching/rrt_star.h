@@ -34,6 +34,7 @@ class RRTStar {
     /* main data structure */
     kdtree* kdtree_;
     std::vector<RRTStarNodePtr> path_node_pool_;
+    std::vector<Eigen::Vector3d> optimal_path_;
 
     /* main search parameters */
     int max_tree_node_num_;
@@ -53,8 +54,10 @@ class RRTStar {
 
     /* main ros publishers and subscribers */
     ros::Publisher vis_path_pub_;
+    ros::Publisher vis_waypoints_pub_;
     ros::Publisher vis_tree_pub_;
     visualization_msgs::Marker vis_path_marker_;
+    visualization_msgs::Marker vis_waypoints_marker_;
     visualization_msgs::Marker vis_tree_marker_;
 
     enum {
@@ -81,7 +84,7 @@ class RRTStar {
     std::vector<std::pair<Eigen::Vector3d, Eigen::Vector3d>> &edges);
     void visWholeTree(std::vector<Eigen::Vector3d> vertices, 
         std::vector<std::pair<Eigen::Vector3d, Eigen::Vector3d>> edges);
-    RRTStarNodePtr getMinCostNode(kdres* &x_end_neighbors);
+    std::vector<Eigen::Vector3d> getOptimalPath();
 
     /* main init function and reset function */
     void init();

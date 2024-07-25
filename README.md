@@ -78,7 +78,7 @@ catkin_make -DCMAKE_CXX_STANDARD=14
   * kino_astar/collision_check_type = 1 : **kino_astar planning**
   * kino_astar/collision_check_type = 2 : **kino_se(3) planning**
   * **(map_type change)** simulator.xml : "map/fix_map_type" = 0 : generate random map
-  * **(map_type change) **simulator.xml : "map/fix_map_type" = 1 : generate fix wall map
+  * **(map_type change)**simulator.xml : "map/fix_map_type" = 1 : generate fix wall map
 
   ```xml
    <!-- kino_astar parameters -->
@@ -129,7 +129,7 @@ catkin_make -DCMAKE_CXX_STANDARD=14
   * "kino_astar/collision_check_type" = 1 : **kino_astar planning**
   * "kino_astar/collision_check_type" = 2 : **kino_se(3) planning**
   * **(map_type change)** simulator.xml : "map/fix_map_type" = 0 : generate random map
-  * **(map_type change) **simulator.xml : "map/fix_map_type" = 1 : generate fix wall map
+  * **(map_type change)**simulator.xml : "map/fix_map_type" = 1 : generate fix wall map
 
   ```xml
   <!-- kino_astar parameters -->
@@ -236,5 +236,37 @@ catkin_make -DCMAKE_CXX_STANDARD=14
 
 ![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/rrt_star.gif?raw=true)
 
+### 3. Trajectory Optimization
 
+#### (1) RRT* + Minimum Snap :
+
+* quick start:
+
+  * install [osqp](https://github.com/osqp/osqp) and [osqp-eigen](https://github.com/robotology/osqp-eigen)(**important!!**)
+
+  * one terminator
+
+    ```shell
+    source devel/setup.bash
+    roslaunch plan_manage single_run_in_sim.launch
+    ```
+
+  * another terminator
+
+    ```shell
+    source devel/setup.bash
+    roslaunch test test_minimum_jerk.launch
+    ```
+
+* method:
+  * **front(Path Finding)**: RRT* or other search-based method, this project is based on RRT*
+  * **end(Trajectory Optimization)**: construct a Quadratic Program(QP) based on the discrete waypoints obtained by front RRT*, I use **OSQP Solver** to solve the QP
+  * reference paper: [D. Mellinger and V. Kumar, “Minimum snap trajectory generation and control for quadrotors”](https://web.archive.org/web/20120713162030id_/http://www.seas.upenn.edu/~dmel/mellingerICRA11.pdf)
+* simulation:
+  * **red Line**: RRT* Path
+  * **red Sphere**: RRT* Waypoints
+  * **purple Line**: minimum jerk trajectory
+
+
+![Image](https://github.com/peiyu-cui/motion-planning/blob/main/pic/minimum_jerk.gif?raw=true)
 

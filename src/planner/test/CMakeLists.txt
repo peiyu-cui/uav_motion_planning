@@ -10,6 +10,7 @@ SET(CMAKE_BUILD_TYPE Debug)
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.7 REQUIRED)
+find_package(OsqpEigen REQUIRED)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -20,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   plan_env
   path_searching
+  traj_optimization
   cv_bridge
 )
 
@@ -51,31 +53,21 @@ include_directories(
 # )
 
 ## Declare a C++ executable
-
+# path_searching
 add_executable(test_astar_node src/test_astar.cpp)
-
 add_executable(test_rrt_node src/test_rrt.cpp)
-
 add_executable(test_rrt_star_node src/test_rrt_star.cpp)
-
 add_executable(test_kino_astar_node src/test_kino_astar.cpp)
-
-
-
 add_executable(test_astar_searching src/test_astar_searching.cpp)
-
-
 add_executable(test_rrt_searching src/test_rrt_searching.cpp)
-
 add_executable(test_rrt_star_searching src/test_rrt_star_searching.cpp)
-
 add_executable(test_kino_astar_searching src/test_kino_astar_searching.cpp)
 
-
+# trajectory_optimization
+add_executable(test_qpsolve src/test_qpsolve.cpp)
+add_executable(test_minimum_jerk src/test_minimum_jerk.cpp)
 
 ## Specify libraries to link a library or executable target against
-
-
 
 target_link_libraries(test_astar_node
   ${catkin_LIBRARIES}
@@ -107,4 +99,14 @@ ${catkin_LIBRARIES}
 
 target_link_libraries(test_kino_astar_searching
 ${catkin_LIBRARIES}
+)
+
+target_link_libraries(test_qpsolve
+${catkin_LIBRARIES}
+traj_optimization
+)
+
+target_link_libraries(test_minimum_jerk
+${catkin_LIBRARIES}
+traj_optimization
 )

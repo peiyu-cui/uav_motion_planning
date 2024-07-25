@@ -1,5 +1,5 @@
 <launch>
-  <arg name="init_x" value="-2.0"/>
+  <arg name="init_x" value="-19.0"/>
   <arg name="init_y" value="0.0"/>
   <arg name="init_z" value="1.0"/> 
   <arg name="map_size_x_"/>
@@ -17,7 +17,7 @@
       <param name="map/z_size"     value="$(arg map_size_z_)" />
       <param name="map/resolution" value="0.1"/> 
       <!-- map type 0: generate random map, 1: fix wall map -->
-      <param name="map/fix_map_type" value="1"/>
+      <param name="map/fix_map_type" value="0"/>
       
       <param name="ObstacleShape/seed" value="1"/>
       <param name="map/obs_num"    value="70"/>
@@ -88,7 +88,7 @@
         <rosparam command="load" file="$(find local_sensing_node)/params/camera.yaml" />
       <!-- common parameters -->
       <!-- control the local sensing horizon and rate -->
-        <param name="sensing_horizon"  value="10.0" />
+        <param name="sensing_horizon"  value="50.0" />
         <param name="sensing_rate"     value="30.0"/>
         <param name="estimation_rate"  value="30.0"/>
 

@@ -18,13 +18,28 @@ void RRTStar::setParam(ros::NodeHandle& nh)
   vis_path_marker_.type = visualization_msgs::Marker::LINE_STRIP;
   vis_path_marker_.action = visualization_msgs::Marker::ADD;
   vis_path_marker_.pose.orientation.w = 1.0;
-  vis_path_marker_.scale.x = 0.2;
-  vis_path_marker_.scale.y = 0.2;
-  vis_path_marker_.scale.z = 0.2;
+  vis_path_marker_.scale.x = 0.1;
+  vis_path_marker_.scale.y = 0.1;
+  vis_path_marker_.scale.z = 0.1;
   vis_path_marker_.color.a = 1.0;
   vis_path_marker_.color.r = 1.0;
   vis_path_marker_.color.g = 0.0;
   vis_path_marker_.color.b = 0.0;
+
+  vis_waypoints_pub_ = nh.advertise<visualization_msgs::Marker>("rrt_star/waypoints", 1);
+  vis_waypoints_marker_.header.frame_id = "world";
+  vis_waypoints_marker_.header.stamp = ros::Time::now();
+  vis_waypoints_marker_.ns = "rrt_star";
+  vis_waypoints_marker_.type = visualization_msgs::Marker::SPHERE_LIST;
+  vis_waypoints_marker_.action = visualization_msgs::Marker::ADD;
+  vis_waypoints_marker_.pose.orientation.w = 1.0;
+  vis_waypoints_marker_.scale.x = 0.3;
+  vis_waypoints_marker_.scale.y = 0.3;
+  vis_waypoints_marker_.scale.z = 0.3;
+  vis_waypoints_marker_.color.a = 1.0;
+  vis_waypoints_marker_.color.r = 1.0;
+  vis_waypoints_marker_.color.g = 0.0;
+  vis_waypoints_marker_.color.b = 0.0;
 
   vis_tree_pub_ = nh.advertise<visualization_msgs::Marker>("rrt_star/tree", 10);
   vis_tree_marker_.header.frame_id = "world";
@@ -218,6 +233,7 @@ void RRTStar::retrievePath(RRTStarNodePtr end_node, std::vector<Eigen::Vector3d>
 void RRTStar::visFeasiblePath(std::vector<Eigen::Vector3d> path)
 {
   vis_path_marker_.points.clear();
+  vis_waypoints_marker_.points.clear();
   for (int i = 0; i < path.size(); i++)
   {
     geometry_msgs::Point pt;
@@ -225,8 +241,10 @@ void RRTStar::visFeasiblePath(std::vector<Eigen::Vector3d> path)
     pt.y = path[i][1];
     pt.z = path[i][2];
     vis_path_marker_.points.push_back(pt);
+    vis_waypoints_marker_.points.push_back(pt);
   }
   vis_path_pub_.publish(vis_path_marker_);
+  vis_waypoints_pub_.publish(vis_waypoints_marker_);
 }
 
 void RRTStar::getWholeTree(std::vector<Eigen::Vector3d> &vertices, 
@@ -272,6 +290,11 @@ void RRTStar::visWholeTree(std::vector<Eigen::Vector3d> vertices,
   //   vis_vertice_marker_.points.push_back(pt);
   // }
   vis_tree_pub_.publish(vis_tree_marker_);
+}
+
+std::vector<Eigen::Vector3d> RRTStar::getOptimalPath()
+{
+  return optimal_path_;
 }
 
 
@@ -364,6 +387,8 @@ int RRTStar::search(Eigen::Vector3d start, Eigen::Vector3d end, std::vector<Eige
             feasible_cost_ = tmp_cost;
 
             retrievePath(global_goal_node, path);
+            optimal_path_.clear();
+            optimal_path_ = path;
             visFeasiblePath(path);
             path.clear();
 
