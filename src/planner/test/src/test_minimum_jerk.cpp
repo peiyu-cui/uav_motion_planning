@@ -33,6 +33,7 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
   Eigen::Vector3d end_acc(0.0, 0.0, 0.0);
   Eigen::Vector3d start_pt(odom_->pose.pose.position.x, odom_->pose.pose.position.y, odom_->pose.pose.position.z);
   Eigen::Vector3d start_vel(odom_->twist.twist.linear.x, odom_->twist.twist.linear.y, odom_->twist.twist.linear.z);
+//  Eigen::Vector3d start_vel(1.0, 0.0, 0.0);
   Eigen::Vector3d start_acc(0.0, 0.0, 0.0);
   std::cout << "Start point: " << start_pt.transpose() << std::endl;
   std::cout << "End point: " << end_pt.transpose() << std::endl;
@@ -66,9 +67,11 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     time_vec.resize(optimal_path.size() - 1);
     for (int i = 0; i < optimal_path.size() - 1; i++)
     {
-        time_vec(i) = 2.0;
+        time_vec(i) = 1.0;
     }
 
+    // start optimization, x, y, z separately, serial optimization
+    // need to change to parallel optimization
     bool success_x = optimizer_->solve(pos_x, bound_vel_x, bound_acc_x, time_vec);
     if (success_x)
     {
