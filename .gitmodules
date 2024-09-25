@@ -1,0 +1,6 @@
+[submodule "3rd/osqp"]
+	path = 3rd/osqp
+	url = https://github.com/osqp/osqp.git
+[submodule "3rd/osqp-eigen"]
+	path = 3rd/osqp-eigen
+	url = https://github.com/robotology/osqp-eigen.git
