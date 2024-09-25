@@ -15,7 +15,7 @@
 3. Clone the repository.
 
     ```bash
-    git clone git@github.com:peiyu-cui/motion-planning.git
+    git clone git@github.com:peiyu-cui/uav_motion_planning.git
     ```
 
 4. Install dependences.
@@ -25,7 +25,7 @@
     sudo apt install libeigen3-dev
     
     # osqp and osqp-eigen
-    cd motion-planning
+    cd uav_motion_planning
     git submodule update --init --recursive
 
     ## osqp
