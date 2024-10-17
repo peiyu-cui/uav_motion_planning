@@ -79,7 +79,7 @@ void pubOdom()
   _odom_pub.publish(odom);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "odom_generator");
   ros::NodeHandle nh;

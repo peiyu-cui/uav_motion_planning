@@ -1,12 +1,12 @@
 <launch>
 
-  <arg name="odom_topic" default="/visual_slam/odom" />
-  <arg name="init_x" value="-19.0" />
-  <arg name="init_y" value="0.0" />
-  <arg name="init_z" value="1.0" />
+  <arg name="odom_topic" default="visual_slam/odom" />
   <arg name="map_size_x" default="40.0" />
   <arg name="map_size_y" default="20.0" />
   <arg name="map_size_z" default="5.0" />
+  <arg name="init_x" value="-19.0" />
+  <arg name="init_y" value="0.0" />
+  <arg name="init_z" value="1.0" />
 
   <!-- rviz -->
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find plan_manage)/config/default.rviz" required="true" />
@@ -14,12 +14,12 @@
   <!-- simulator -->
   <include file="$(find plan_manage)/launch/simulator.xml">
     <arg name="odometry_topic" value="$(arg odom_topic)" />
-    <arg name="init_x" value="$(arg init_x)" />
-    <arg name="init_y" value="$(arg init_y)" />
-    <arg name="init_z" value="$(arg init_z)" />
     <arg name="map_size_x_" value="$(arg map_size_x)" />
     <arg name="map_size_y_" value="$(arg map_size_y)" />
     <arg name="map_size_z_" value="$(arg map_size_z)" />
+    <arg name="init_x" value="$(arg init_x)" />
+    <arg name="init_y" value="$(arg init_y)" />
+    <arg name="init_z" value="$(arg init_z)" />
   </include>
 
 </launch>

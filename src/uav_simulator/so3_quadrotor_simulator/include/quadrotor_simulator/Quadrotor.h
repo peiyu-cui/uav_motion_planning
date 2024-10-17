@@ -16,7 +16,7 @@ public:
     Eigen::Vector3d v;
     Eigen::Matrix3d R;
     Eigen::Vector3d omega;
-    Eigen::Array4d  motor_rpm;
+    Eigen::Array4d motor_rpm;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
 
@@ -77,35 +77,34 @@ public:
 
   // For internal use, but needs to be public for odeint
   typedef boost::array<double, 22> InternalState;
-  void operator()(const Quadrotor::InternalState& x,
-                  Quadrotor::InternalState&       dxdt, const double /* t */);
+  void operator()(const Quadrotor::InternalState& x, Quadrotor::InternalState& dxdt, const double /* t */);
 
   Eigen::Vector3d getAcc() const;
 
 private:
   void updateInternalState(void);
 
-  double          alpha0; // AOA
-  double          g_;     // gravity
-  double          mass_;
-  Eigen::Matrix3d J_; // Inertia
-  double          kf_;
-  double          km_;
-  double          prop_radius_;
-  double          arm_length_;
-  double          motor_time_constant_; // unit: sec
-  double          max_rpm_;
-  double          min_rpm_;
+  double alpha0;  // AOA
+  double g_;      // gravity
+  double mass_;
+  Eigen::Matrix3d J_;  // Inertia
+  double kf_;
+  double km_;
+  double prop_radius_;
+  double arm_length_;
+  double motor_time_constant_;  // unit: sec
+  double max_rpm_;
+  double min_rpm_;
 
   Quadrotor::State state_;
 
   Eigen::Vector3d acc_;
 
-  Eigen::Array4d  input_;
+  Eigen::Array4d input_;
   Eigen::Vector3d external_force_;
   Eigen::Vector3d external_moment_;
 
   InternalState internal_state_;
 };
-}
+}  // namespace QuadrotorSimulator
 #endif
