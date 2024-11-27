@@ -165,7 +165,7 @@ int main(int argc, char **argv)
   nh.getParam("map/z_size", z_size_);
 
   // subscribe point cloud
-  odom_sub_ = nh.subscribe("odometry", 50, rcvOdometryCallbck);
+  odom_sub_ = nh.subscribe("odom", 50, rcvOdometryCallbck);
   global_map_sub_ = nh.subscribe("global_map", 1, rcvGlobalPointCloudCallBack);
   local_map_sub_ = nh.subscribe("local_map", 1, rcvLocalPointCloudCallBack);
 

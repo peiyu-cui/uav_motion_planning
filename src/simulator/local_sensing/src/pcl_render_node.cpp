@@ -360,7 +360,7 @@ int main(int argc, char **argv)
   // subscribe point cloud
   global_map_sub_ = nh.subscribe("global_map", 1, rcvGlobalPointCloudCallBack);
   local_map_sub_ = nh.subscribe("local_map", 1, rcvLocalPointCloudCallBack);
-  odom_sub_ = nh.subscribe("odometry", 50, rcvOdometryCallbck);
+  odom_sub_ = nh.subscribe("odom", 50, rcvOdometryCallbck);
 
   // publisher depth image and color image
   pub_depth = nh.advertise<sensor_msgs::Image>("depth", 1000);

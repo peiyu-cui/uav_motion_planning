@@ -452,8 +452,8 @@ int main(int argc, char **argv)
   global_map_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 1);
   // click_map_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/pcl_render_node/local_map", 1);
 
-  odom_sub_ = nh.subscribe("/odom", 50, rcvOdometryCallbck);
-  // click_sub_ = nh.subscribe("/goal", 10, clickCallback);
+  odom_sub_ = nh.subscribe("odom", 50, rcvOdometryCallbck);
+  // click_sub_ = nh.subscribe("goal", 10, clickCallback);
 
   nh.param("init_state_x", init_x_, 0.0);
   nh.param("init_state_y", init_y_, 0.0);

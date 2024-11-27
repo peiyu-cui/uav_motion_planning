@@ -13,7 +13,7 @@
 
   <!-- simulator -->
   <include file="$(find plan_manage)/launch/simulator.xml">
-    <arg name="odometry_topic" value="$(arg odom_topic)" />
+    <arg name="odom_topic" value="$(arg odom_topic)" />
     <arg name="map_size_x_" value="$(arg map_size_x)" />
     <arg name="map_size_y_" value="$(arg map_size_y)" />
     <arg name="map_size_z_" value="$(arg map_size_z)" />

@@ -6,19 +6,13 @@
 
 1. Install [ROS](http://wiki.ros.org/ROS/Installation) (Desktop-Full Install *Recommended*).
 
-2. Install git.
-
-    ```bash
-    sudo apt install git
-    ```
-
-3. Clone the repository.
+2. Clone the repository.
 
     ```bash
     git clone git@github.com:peiyu-cui/uav_motion_planning.git
     ```
 
-4. Install dependences.
+3. Install dependences.
 
     ```bash
     # eigen
@@ -45,7 +39,7 @@
     sudo make install
     ```
 
-5. Compile the code.
+4. Compile the code.
 
     ```bash
     catkin_make -DCMAKE_CXX_STANDARD=14

@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="odometry_topic" />
+  <arg name="odom_topic" />
   <arg name="map_size_x_" />
   <arg name="map_size_y_" />
   <arg name="map_size_z_" />
@@ -10,7 +10,7 @@
 
   <!-- map generator -->
   <node name="random_forest" pkg="map_generator" type="random_forest" output="screen">
-    <remap from="~odometry" to="$(arg odometry_topic)" />
+    <remap from="~odom" to="$(arg odom_topic)" />
     <param name="init_state_x" value="$(arg init_x)" />
     <param name="init_state_y" value="$(arg init_y)" />
     <param name="map/x_size" value="$(arg map_size_x_)" />
@@ -48,7 +48,7 @@
     <param name="simulator/init_state_y" value="$(arg init_y)" />
     <param name="simulator/init_state_z" value="$(arg init_z)" />
 
-    <remap from="~odom" to="$(arg odometry_topic)" />
+    <remap from="~odom" to="$(arg odom_topic)" />
     <remap from="~cmd" to="so3_cmd" />
     <remap from="~force_disturbance" to="force_disturbance" />
     <remap from="~moment_disturbance" to="moment_disturbance" />
@@ -59,7 +59,7 @@
     <param name="so3_control/init_state_x" value="$(arg init_x)" />
     <param name="so3_control/init_state_y" value="$(arg init_y)" />
     <param name="so3_control/init_state_z" value="$(arg init_z)" />
-    <remap from="~odom" to="$(arg odometry_topic)" />
+    <remap from="~odom" to="$(arg odom_topic)" />
     <remap from="~position_cmd" to="/planning/pos_cmd" />
     <remap from="~motors" to="motors" />
     <remap from="~corrections" to="corrections" />
@@ -74,17 +74,17 @@
   </node>
 
   <!-- fake drone: position and velocity and acceleration to odom -->
-  <!-- <node pkg="poscmd_2_odom" name="drone_$(arg drone_id)_poscmd_2_odom" type="poscmd_2_odom" output="screen">
+  <!-- <node pkg="fake_drone" name="fake_drone" type="fake_drone" output="screen">
     <param name="init_x" value="$(arg init_x_)"/>
     <param name="init_y" value="$(arg init_y_)"/>
     <param name="init_z" value="$(arg init_z_)"/>
-    <remap from="~command" to="drone_$(arg drone_id)_planning/pos_cmd"/>
-    <remap from="~odometry" to="drone_$(arg drone_id)_$(arg odometry_topic)"/>
+    <remap from="~cmd" to="/planning/pos_cmd"/>
+    <remap from="~odom" to="$(arg odom_topic)"/>
   </node> -->
 
   <!-- odom visualization -->
   <node pkg="odom_visualization" name="odom_visualization" type="odom_visualization" output="screen">
-    <remap from="~odom" to="$(arg odometry_topic)" />
+    <remap from="~odom" to="$(arg odom_topic)" />
     <param name="color/a" value="1.0" />
     <param name="color/r" value="0.0" />
     <param name="color/g" value="0.0" />
@@ -112,7 +112,7 @@
 
     <!-- virtual global cloud -->
     <remap from="~global_map" to="/map_generator/global_cloud" />
-    <remap from="~odometry" to="$(arg odometry_topic)" />
+    <remap from="~odom" to="$(arg odom_topic)" />
   </node>
 
 </launch>
