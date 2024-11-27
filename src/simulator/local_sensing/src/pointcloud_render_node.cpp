@@ -17,235 +17,183 @@
 using namespace std;
 using namespace Eigen;
 
-ros::Publisher pub_cloud;
+ros::Publisher cloud_pub_;
 
-sensor_msgs::PointCloud2 local_map_pcl;
-sensor_msgs::PointCloud2 local_depth_pcl;
+sensor_msgs::PointCloud2 local_map_pcl, local_depth_pcl;
 
-ros::Subscriber odom_sub;
-ros::Subscriber global_map_sub, local_map_sub;
+ros::Subscriber odom_sub_, global_map_sub_, local_map_sub_;
 
-ros::Timer local_sensing_timer;
+ros::Timer local_sensing_timer_;
 
 bool has_global_map(false);
 bool has_local_map(false);
-bool has_odom(false);
+bool has_odom_(false);
 
-nav_msgs::Odometry _odom;
+nav_msgs::Odometry odom_;
 
-double sensing_horizon, sensing_rate, estimation_rate;
-double _x_size, _y_size, _z_size;
-double _gl_xl, _gl_yl, _gl_zl;
-double _resolution, _inv_resolution;
-int _GLX_SIZE, _GLY_SIZE, _GLZ_SIZE;
+double sensing_horizon_, sensing_rate_, estimation_rate_;
+double x_size_, y_size_, z_size_;
+double x_l_, y_l_, z_l_;
+double resolution_, inv_resolution_;
+int GLX_SIZE_, GLY_SIZE_, GLZ_SIZE_;
 
 ros::Time last_odom_stamp = ros::TIME_MAX;
 
-inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i& index) {
-  Eigen::Vector3d pt;
-  pt(0) = ((double)index(0) + 0.5) * _resolution + _gl_xl;
-  pt(1) = ((double)index(1) + 0.5) * _resolution + _gl_yl;
-  pt(2) = ((double)index(2) + 0.5) * _resolution + _gl_zl;
+pcl::PointCloud<pcl::PointXYZ> cloud_all_map_, local_map_;
+pcl::VoxelGrid<pcl::PointXYZ> voxel_sampler_;
+sensor_msgs::PointCloud2 local_map_pcd_;
 
+pcl::search::KdTree<pcl::PointXYZ> kdtreeLocalMap_;
+vector<int> pointIdxRadiusSearch_;
+vector<float> pointRadiusSquaredDistance_;
+
+inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i &index)
+{
+  Eigen::Vector3d pt;
+  pt(0) = ((double)index(0) + 0.5) * resolution_ + x_l_;
+  pt(1) = ((double)index(1) + 0.5) * resolution_ + y_l_;
+  pt(2) = ((double)index(2) + 0.5) * resolution_ + z_l_;
   return pt;
 };
 
-inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d& pt) {
+inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d &pt)
+{
   Eigen::Vector3i idx;
-  idx(0) = std::min(std::max(int((pt(0) - _gl_xl) * _inv_resolution), 0),
-                    _GLX_SIZE - 1);
-  idx(1) = std::min(std::max(int((pt(1) - _gl_yl) * _inv_resolution), 0),
-                    _GLY_SIZE - 1);
-  idx(2) = std::min(std::max(int((pt(2) - _gl_zl) * _inv_resolution), 0),
-                    _GLZ_SIZE - 1);
-
+  idx(0) = std::min(std::max(int((pt(0) - x_l_) * inv_resolution_), 0), GLX_SIZE_ - 1);
+  idx(1) = std::min(std::max(int((pt(1) - y_l_) * inv_resolution_), 0), GLY_SIZE_ - 1);
+  idx(2) = std::min(std::max(int((pt(2) - z_l_) * inv_resolution_), 0), GLZ_SIZE_ - 1);
   return idx;
 };
 
-void rcvOdometryCallbck(const nav_msgs::Odometry& odom) {
-  /*if(!has_global_map)
-    return;*/
-  has_odom = true;
-  _odom = odom;
+void rcvOdometryCallbck(const nav_msgs::Odometry &odom)
+{
+  has_odom_ = true;
+  odom_ = odom;
 }
 
-pcl::PointCloud<pcl::PointXYZ> _cloud_all_map, _local_map;
-pcl::VoxelGrid<pcl::PointXYZ> _voxel_sampler;
-sensor_msgs::PointCloud2 _local_map_pcd;
-
-pcl::search::KdTree<pcl::PointXYZ> _kdtreeLocalMap;
-vector<int> _pointIdxRadiusSearch;
-vector<float> _pointRadiusSquaredDistance;
-
-void rcvGlobalPointCloudCallBack(
-    const sensor_msgs::PointCloud2& pointcloud_map) {
-  if (has_global_map) return;
+void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+{
+  if (has_global_map)
+    return;
 
   ROS_WARN("Global Pointcloud received..");
 
   pcl::PointCloud<pcl::PointXYZ> cloud_input;
   pcl::fromROSMsg(pointcloud_map, cloud_input);
 
-  _voxel_sampler.setLeafSize(0.1f, 0.1f, 0.1f);
-  _voxel_sampler.setInputCloud(cloud_input.makeShared());
-  _voxel_sampler.filter(_cloud_all_map);
+  voxel_sampler_.setLeafSize(0.1f, 0.1f, 0.1f);
+  voxel_sampler_.setInputCloud(cloud_input.makeShared());
+  voxel_sampler_.filter(cloud_all_map_);
 
-  _kdtreeLocalMap.setInputCloud(_cloud_all_map.makeShared());
+  kdtreeLocalMap_.setInputCloud(cloud_all_map_.makeShared());
 
   has_global_map = true;
 }
 
-void renderSensedPoints(const ros::TimerEvent& event) {
-  if (!has_global_map || !has_odom) return;
-
-  Eigen::Quaterniond q;
-  q.x() = _odom.pose.pose.orientation.x;
-  q.y() = _odom.pose.pose.orientation.y;
-  q.z() = _odom.pose.pose.orientation.z;
-  q.w() = _odom.pose.pose.orientation.w;
-
-  Eigen::Matrix3d rot;
-  rot = q.toRotationMatrix();
-  Eigen::Vector3d yaw_vec = rot.col(0);
-
-  _local_map.points.clear();
-  pcl::PointXYZ searchPoint(_odom.pose.pose.position.x,
-                            _odom.pose.pose.position.y,
-                            _odom.pose.pose.position.z);
-  _pointIdxRadiusSearch.clear();
-  _pointRadiusSquaredDistance.clear();
-
-  pcl::PointXYZ pt;
-  if (_kdtreeLocalMap.radiusSearch(searchPoint, sensing_horizon,
-                                   _pointIdxRadiusSearch,
-                                   _pointRadiusSquaredDistance) > 0) {
-    for (size_t i = 0; i < _pointIdxRadiusSearch.size(); ++i) {
-      pt = _cloud_all_map.points[_pointIdxRadiusSearch[i]];
-      // default sensing angle is +-15 degree
-      if ((fabs(pt.z - _odom.pose.pose.position.z) / (sensing_horizon)) >
-          tan(M_PI / 12.0))
-        continue;
-      // check if the point is behind the robot
-      Vector3d pt_vec(pt.x - _odom.pose.pose.position.x,
-                      pt.y - _odom.pose.pose.position.y,
-                      pt.z - _odom.pose.pose.position.z);
-
-      if (pt_vec.dot(yaw_vec) < 0) continue;
-
-      _local_map.points.push_back(pt);
-    }
-  } else {
-    return;
-  }
-
-  _local_map.width = _local_map.points.size();
-  _local_map.height = 1;
-  _local_map.is_dense = true;
-
-  pcl::toROSMsg(_local_map, _local_map_pcd);
-  _local_map_pcd.header.frame_id = "world";
-
-  pub_cloud.publish(_local_map_pcd);
-}
-
-
-// void renderLocalPoints(const ros::TimerEvent& event)
-// {
-//   if (!has_global_map || !has_odom) return;
-
-//   Eigen::Quaterniond q;
-//   q.x() = _odom.pose.pose.orientation.x;
-//   q.y() = _odom.pose.pose.orientation.y;
-//   q.z() = _odom.pose.pose.orientation.z;
-//   q.w() = _odom.pose.pose.orientation.w;
-
-//   _local_map.points.clear();
-//   pcl::PointXYZ searchPoint(_odom.pose.pose.position.x,
-//                             _odom.pose.pose.position.y,
-//                             _odom.pose.pose.position.z);
-//   _pointIdxRadiusSearch.clear();
-//   _pointRadiusSquaredDistance.clear();
-
-//   pcl::PointXYZ pt;
-//   if (_kdtreeLocalMap.radiusSearch(searchPoint, sensing_horizon,
-//                                    _pointIdxRadiusSearch,
-//                                    _pointRadiusSquaredDistance) > 0) {
-//     for (size_t i = 0; i < _pointIdxRadiusSearch.size(); ++i) {
-//       pt = _cloud_all_map.points[_pointIdxRadiusSearch[i]];
-
-//       _local_map.points.push_back(pt);
-//     }
-//   }
-//   else {
-//     return;
-//   }
-
-//   _local_map.width = _local_map.points.size();
-//   _local_map.height = 1;
-//   _local_map.is_dense = true;
-
-//   pcl::toROSMsg(_local_map, _local_map_pcd);
-//   _local_map_pcd.header.frame_id = "world";
-
-//   pub_cloud.publish(_local_map_pcd);
-
-// }
-
-
-void rcvLocalPointCloudCallBack(
-    const sensor_msgs::PointCloud2& pointcloud_map) {
+void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+{
   // do nothing, fix later
 }
 
-int main(int argc, char** argv) {
-  ros::init(argc, argv, "pcl_render");
+void renderSensedPoints(const ros::TimerEvent &event)
+{
+  if (!has_global_map || !has_odom_)
+    return;
+
+  Eigen::Quaterniond q;
+  q.x() = odom_.pose.pose.orientation.x;
+  q.y() = odom_.pose.pose.orientation.y;
+  q.z() = odom_.pose.pose.orientation.z;
+  q.w() = odom_.pose.pose.orientation.w;
+
+  Eigen::Matrix3d rot;
+  rot = q;
+  Eigen::Vector3d yaw_vec = rot.col(0);
+
+  local_map_.points.clear();
+  pcl::PointXYZ searchPoint(odom_.pose.pose.position.x, odom_.pose.pose.position.y, odom_.pose.pose.position.z);
+  pointIdxRadiusSearch_.clear();
+  pointRadiusSquaredDistance_.clear();
+
+  pcl::PointXYZ pt;
+  if (kdtreeLocalMap_.radiusSearch(searchPoint, sensing_horizon_, pointIdxRadiusSearch_, pointRadiusSquaredDistance_) > 0)
+  {
+    for (size_t i = 0; i < pointIdxRadiusSearch_.size(); i++)
+    {
+      pt = cloud_all_map_.points[pointIdxRadiusSearch_[i]];
+
+      // if ((fabs(pt.z - odom_.pose.pose.position.z) / (pt.x - odom_.pose.pose.position.x)) >
+      //     tan(M_PI / 12.0))
+      //   continue;
+      if ((fabs(pt.z - odom_.pose.pose.position.z) / sensing_horizon_) > tan(M_PI / 6.0))
+        continue;
+
+      Vector3d pt_vec(pt.x - odom_.pose.pose.position.x, pt.y - odom_.pose.pose.position.y, pt.z - odom_.pose.pose.position.z);
+
+      if (pt_vec.normalized().dot(yaw_vec) < 0.5)
+        continue;
+
+      local_map_.points.push_back(pt);
+    }
+  }
+  else
+  {
+    return;
+  }
+
+  local_map_.width = local_map_.points.size();
+  local_map_.height = 1;
+  local_map_.is_dense = true;
+
+  pcl::toROSMsg(local_map_, local_map_pcd_);
+  local_map_pcd_.header.frame_id = "world";
+
+  cloud_pub_.publish(local_map_pcd_);
+}
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "pcl_render_node");
   ros::NodeHandle nh("~");
 
-  nh.getParam("sensing_horizon", sensing_horizon);
-  nh.getParam("sensing_rate", sensing_rate);
-  nh.getParam("estimation_rate", estimation_rate);
+  nh.getParam("sensing_horizon", sensing_horizon_);
+  nh.getParam("sensing_rate", sensing_rate_);
+  nh.getParam("estimation_rate", estimation_rate_);
 
-  nh.getParam("map/x_size", _x_size);
-  nh.getParam("map/y_size", _y_size);
-  nh.getParam("map/z_size", _z_size);
+  nh.getParam("map/x_size", x_size_);
+  nh.getParam("map/y_size", y_size_);
+  nh.getParam("map/z_size", z_size_);
 
   // subscribe point cloud
-  // sim env: global cloud map
-  global_map_sub = nh.subscribe("global_map", 1, rcvGlobalPointCloudCallBack);
-  // real env: local cloud map
-  // customize rcvLocalPointCloudCallBack function to construct the esdf map
-  local_map_sub = nh.subscribe("local_map", 1, rcvLocalPointCloudCallBack);
-  odom_sub = nh.subscribe("odometry", 50, rcvOdometryCallbck);
+  odom_sub_ = nh.subscribe("odometry", 50, rcvOdometryCallbck);
+  global_map_sub_ = nh.subscribe("global_map", 1, rcvGlobalPointCloudCallBack);
+  local_map_sub_ = nh.subscribe("local_map", 1, rcvLocalPointCloudCallBack);
 
   // publisher depth image and color image
-  pub_cloud =
-      nh.advertise<sensor_msgs::PointCloud2>("/pcl_render_node/cloud", 10);
+  cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("cloud", 10);
 
-  double sensing_duration = 1.0 / sensing_rate * 2.5;
+  double sensing_duration = 1.0 / sensing_rate_ * 2.5;
 
-  // Timer to publish local cloud map
-  // need odometry to get the current position of the robot
-  local_sensing_timer =
-      nh.createTimer(ros::Duration(sensing_duration), renderSensedPoints);
-  // local_sensing_timer =
-  //     nh.createTimer(ros::Duration(sensing_duration), renderLocalPoints);
+  local_sensing_timer_ = nh.createTimer(ros::Duration(sensing_duration), renderSensedPoints);
 
+  inv_resolution_ = 1.0 / resolution_;
 
-  _inv_resolution = 1.0 / _resolution;
+  x_l_ = -x_size_ / 2.0;
+  y_l_ = -y_size_ / 2.0;
+  z_l_ = 0.0;
 
-  _gl_xl = -_x_size / 2.0;
-  _gl_yl = -_y_size / 2.0;
-  _gl_zl = 0.0;
-
-  _GLX_SIZE = (int)(_x_size * _inv_resolution);
-  _GLY_SIZE = (int)(_y_size * _inv_resolution);
-  _GLZ_SIZE = (int)(_z_size * _inv_resolution);
+  GLX_SIZE_ = (int)(x_size_ * inv_resolution_);
+  GLY_SIZE_ = (int)(y_size_ * inv_resolution_);
+  GLZ_SIZE_ = (int)(z_size_ * inv_resolution_);
 
   ros::Rate rate(100);
   bool status = ros::ok();
-  while (status) {
+  while (status)
+  {
     ros::spinOnce();
     status = ros::ok();
     rate.sleep();
   }
+
+  return 0;
 }

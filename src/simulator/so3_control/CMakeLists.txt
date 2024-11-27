@@ -151,11 +151,10 @@ find_package(Eigen3 REQUIRED)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -170,14 +169,13 @@ add_library(SO3Control src/SO3Control.cpp)
 add_library(so3_control_nodelet src/so3_control_nodelet.cpp)
 
 target_link_libraries(so3_control_nodelet 
-    ${catkin_LIBRARIES}
-    SO3Control
+  ${catkin_LIBRARIES}
+  SO3Control
 )
-
 
 add_executable(control_example src/control_example.cpp)
 target_link_libraries(control_example 
-${catkin_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 ## Add cmake target dependencies of the executable/library

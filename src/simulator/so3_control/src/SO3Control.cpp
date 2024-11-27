@@ -18,23 +18,23 @@ void SO3Control::setGravity(const double g)
   g_ = g;
 }
 
-void SO3Control::setPosition(const Eigen::Vector3d& position)
+void SO3Control::setPosition(const Eigen::Vector3d &position)
 {
   pos_ = position;
 }
 
-void SO3Control::setVelocity(const Eigen::Vector3d& velocity)
+void SO3Control::setVelocity(const Eigen::Vector3d &velocity)
 {
   vel_ = velocity;
 }
 
-void SO3Control::calculateControl(const Eigen::Vector3d& des_pos, const Eigen::Vector3d& des_vel,
-                                  const Eigen::Vector3d& des_acc, const double des_yaw, const double des_yaw_dot,
-                                  const Eigen::Vector3d& kx, const Eigen::Vector3d& kv)
+void SO3Control::calculateControl(const Eigen::Vector3d &des_pos,
+                                  const Eigen::Vector3d &des_vel,
+                                  const Eigen::Vector3d &des_acc,
+                                  const double des_yaw, const double des_yaw_dot,
+                                  const Eigen::Vector3d &kx,
+                                  const Eigen::Vector3d &kv)
 {
-  //  ROS_INFO("Error %lf %lf %lf", (des_pos - pos_).norm(),
-  //           (des_vel - vel_).norm(), (des_acc - acc_).norm());
-
   bool flag_use_pos = !(std::isnan(des_pos(0)) || std::isnan(des_pos(1)) || std::isnan(des_pos(2)));
   bool flag_use_vel = !(std::isnan(des_vel(0)) || std::isnan(des_vel(1)) || std::isnan(des_vel(2)));
   bool flag_use_acc = !(std::isnan(des_acc(0)) || std::isnan(des_acc(1)) || std::isnan(des_acc(2)));
@@ -50,14 +50,6 @@ void SO3Control::calculateControl(const Eigen::Vector3d& des_pos, const Eigen::V
   Eigen::Vector3d ka(fabs(totalError[0]) > 3 ? 0 : (fabs(totalError[0]) * 0.2),
                      fabs(totalError[1]) > 3 ? 0 : (fabs(totalError[1]) * 0.2),
                      fabs(totalError[2]) > 3 ? 0 : (fabs(totalError[2]) * 0.2));
-
-  // std::cout << des_pos.transpose() << std::endl;
-  // std::cout << des_vel.transpose() << std::endl;
-  // std::cout << des_acc.transpose() << std::endl;
-  // std::cout << des_yaw << std::endl;
-  // std::cout << pos_.transpose() << std::endl;
-  // std::cout << vel_.transpose() << std::endl;
-  // std::cout << acc_.transpose() << std::endl;
 
   force_ = mass_ * g_ * Eigen::Vector3d(0, 0, 1);
   if (flag_use_pos)
@@ -100,17 +92,17 @@ void SO3Control::calculateControl(const Eigen::Vector3d& des_pos, const Eigen::V
   orientation_ = Eigen::Quaterniond(R);
 }
 
-const Eigen::Vector3d& SO3Control::getComputedForce(void)
+const Eigen::Vector3d &SO3Control::getComputedForce()
 {
   return force_;
 }
 
-const Eigen::Quaterniond& SO3Control::getComputedOrientation(void)
+const Eigen::Quaterniond &SO3Control::getComputedOrientation()
 {
   return orientation_;
 }
 
-void SO3Control::setAcc(const Eigen::Vector3d& acc)
+void SO3Control::setAcc(const Eigen::Vector3d &acc)
 {
   acc_ = acc;
 }

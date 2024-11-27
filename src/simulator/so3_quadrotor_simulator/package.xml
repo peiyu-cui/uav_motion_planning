@@ -2,9 +2,7 @@
   <version>0.0.0</version>
   <name>so3_quadrotor_simulator</name>
   <description>
-
-     quadrotor_simulator
-
+    quadrotor_simulator
   </description>
 
   <maintainer email="todo@todo.todo">Kartik Mohta</maintainer>
@@ -24,5 +22,3 @@
   <run_depend>cmake_utils</run_depend>
 
 </package>
-
-

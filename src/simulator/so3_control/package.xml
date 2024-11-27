@@ -1,15 +1,12 @@
 <package>
   <version>0.0.0</version>
   <name>so3_control</name>
-  <description >
-
-     so3_control
-
+  <description>
+    so3_control
   </description>
   <maintainer email="todo@todo.todo">Kartik Mohta</maintainer>
   <license>BSD</license>
   <url>http://ros.org/wiki/so3_control</url>
-
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -28,8 +25,6 @@
   <run_depend>cmake_utils</run_depend>
 
   <export>
-    <nodelet plugin="${prefix}/nodelet_plugin.xml"/>
+    <nodelet plugin="${prefix}/nodelet_plugin.xml" />
   </export>
 </package>
-
-

@@ -2,7 +2,7 @@
 #include <quadrotor_msgs/PositionCommand.h>
 #include <ros/ros.h>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   ros::init(argc, argv, "quad_sim_example");
   ros::NodeHandle nh("~");
@@ -36,9 +36,9 @@ int main(int argc, char** argv)
     for (int i = 0; i < 500; i++)
     {
       quadrotor_msgs::PositionCommand cmd;
-      cmd.position.x = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.position.y = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.position.z = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
+      cmd.position.x = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.position.y = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.position.z = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
       cmd.velocity.x = -1.0;
       cmd.velocity.y = 0.0;
       cmd.velocity.z = 0.0;
@@ -55,12 +55,12 @@ int main(int argc, char** argv)
     for (int i = 0; i < 500; i++)
     {
       quadrotor_msgs::PositionCommand cmd;
-      cmd.position.x = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.position.y = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.position.z = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.velocity.x = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.velocity.y = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
-      cmd.velocity.z = std::numeric_limits<float>::quiet_NaN();  // lower-order commands must be disabled by nan
+      cmd.position.x = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.position.y = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.position.z = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.velocity.x = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.velocity.y = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
+      cmd.velocity.z = std::numeric_limits<float>::quiet_NaN(); // lower-order commands must be disabled by nan
       cmd.acceleration.x = 1.0;
       cmd.acceleration.y = 0.0;
       cmd.acceleration.z = 0.0;
