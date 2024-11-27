@@ -29,7 +29,6 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
   std::cout << "End point: " << end_pt.transpose() << std::endl;
   int success = kino_astar_->search(start_pt, start_vel, end_pt, end_vel, path);
 
-
   if (success == 1)
   {
     visualization_msgs::Marker path_marker;
@@ -71,7 +70,7 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
   kino_astar_->reset();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test_kino_astar_searching");
   ros::NodeHandle nh("~");
@@ -83,7 +82,7 @@ int main(int argc, char **argv)
 
   GridMap::Ptr grid_map = std::make_shared<GridMap>();
   grid_map->initMap(nh);
-  
+
   kino_astar_ = std::make_shared<path_searching::KinoAstar>();
 
   kino_astar_->setParam(nh);

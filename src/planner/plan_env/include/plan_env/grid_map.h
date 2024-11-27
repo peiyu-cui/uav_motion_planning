@@ -30,10 +30,13 @@ using namespace std;
 
 // voxel hashing
 template <typename T>
-struct matrix_hash : std::unary_function<T, size_t> {
-  std::size_t operator()(T const& matrix) const {
+struct matrix_hash : std::unary_function<T, size_t>
+{
+  std::size_t operator()(T const& matrix) const
+  {
     size_t seed = 0;
-    for (size_t i = 0; i < matrix.size(); ++i) {
+    for (size_t i = 0; i < matrix.size(); ++i)
+    {
       auto elem = *(matrix.data() + i);
       seed ^= std::hash<typename T::Scalar>()(elem) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
@@ -43,8 +46,8 @@ struct matrix_hash : std::unary_function<T, size_t> {
 
 // constant parameters
 
-struct MappingParameters {
-
+struct MappingParameters
+{
   /* map properties */
   Eigen::Vector3d map_origin_, map_size_;
   Eigen::Vector3d map_min_boundary_, map_max_boundary_;  // map range in pos
@@ -84,7 +87,8 @@ struct MappingParameters {
 
 // intermediate mapping data for fusion
 
-struct MappingData {
+struct MappingData
+{
   // main map data, occupancy of each voxel and Euclidean distance
 
   std::vector<double> occupancy_buffer_;
@@ -132,12 +136,22 @@ struct MappingData {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-class GridMap {
+class GridMap
+{
 public:
-  GridMap() {}
-  ~GridMap() {}
+  GridMap()
+  {
+  }
+  ~GridMap()
+  {
+  }
 
-  enum { POSE_STAMPED = 1, ODOMETRY = 2, INVALID_IDX = -10000 };
+  enum
+  {
+    POSE_STAMPED = 1,
+    ODOMETRY = 2,
+    INVALID_IDX = -10000
+  };
 
   // occupancy map management
   void resetBuffer();
@@ -186,8 +200,7 @@ private:
   MappingData md_;
 
   // get depth image and camera pose
-  void depthPoseCallback(const sensor_msgs::ImageConstPtr& img,
-                         const geometry_msgs::PoseStampedConstPtr& pose);
+  void depthPoseCallback(const sensor_msgs::ImageConstPtr& img, const geometry_msgs::PoseStampedConstPtr& pose);
   void depthOdomCallback(const sensor_msgs::ImageConstPtr& img, const nav_msgs::OdometryConstPtr& odom);
   void cloudCallback(const sensor_msgs::PointCloud2ConstPtr& img);
   void localCloudCallback(const sensor_msgs::PointCloud2ConstPtr& img);
@@ -206,14 +219,12 @@ private:
   int setCacheOccupancy(Eigen::Vector3d pos, int occ);
   Eigen::Vector3d closetPointInMap(const Eigen::Vector3d& pt, const Eigen::Vector3d& camera_pt);
 
-
   // typedef message_filters::sync_policies::ExactTime<sensor_msgs::Image,
   // nav_msgs::Odometry> SyncPolicyImageOdom; typedef
   // message_filters::sync_policies::ExactTime<sensor_msgs::Image,
   // geometry_msgs::PoseStamped> SyncPolicyImagePose;
 
-  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, nav_msgs::Odometry>
-      SyncPolicyImageOdom;
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, nav_msgs::Odometry> SyncPolicyImageOdom;
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, geometry_msgs::PoseStamped>
       SyncPolicyImagePose;
   typedef shared_ptr<message_filters::Synchronizer<SyncPolicyImagePose>> SynchronizerImagePose;
@@ -243,15 +254,18 @@ private:
 /* ============================== definition of inline function
  * ============================== */
 
-inline int GridMap::toAddress(const Eigen::Vector3i& id) {
+inline int GridMap::toAddress(const Eigen::Vector3i& id)
+{
   return id(0) * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2) + id(1) * mp_.map_voxel_num_(2) + id(2);
 }
 
-inline int GridMap::toAddress(int& x, int& y, int& z) {
+inline int GridMap::toAddress(int& x, int& y, int& z)
+{
   return x * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2) + y * mp_.map_voxel_num_(2) + z;
 }
 
-inline void GridMap::boundIndex(Eigen::Vector3i& id) {
+inline void GridMap::boundIndex(Eigen::Vector3i& id)
+{
   Eigen::Vector3i id1;
   id1(0) = max(min(id(0), mp_.map_voxel_num_(0) - 1), 0);
   id1(1) = max(min(id(1), mp_.map_voxel_num_(1) - 1), 0);
@@ -259,19 +273,22 @@ inline void GridMap::boundIndex(Eigen::Vector3i& id) {
   id = id1;
 }
 
-inline bool GridMap::isUnknown(const Eigen::Vector3i& id) {
+inline bool GridMap::isUnknown(const Eigen::Vector3i& id)
+{
   Eigen::Vector3i id1 = id;
   boundIndex(id1);
   return md_.occupancy_buffer_[toAddress(id1)] < mp_.clamp_min_log_ - 1e-3;
 }
 
-inline bool GridMap::isUnknown(const Eigen::Vector3d& pos) {
+inline bool GridMap::isUnknown(const Eigen::Vector3d& pos)
+{
   Eigen::Vector3i idc;
   posToIndex(pos, idc);
   return isUnknown(idc);
 }
 
-inline bool GridMap::isKnownFree(const Eigen::Vector3i& id) {
+inline bool GridMap::isKnownFree(const Eigen::Vector3i& id)
+{
   Eigen::Vector3i id1 = id;
   boundIndex(id1);
   int adr = toAddress(id1);
@@ -281,7 +298,8 @@ inline bool GridMap::isKnownFree(const Eigen::Vector3i& id) {
   return md_.occupancy_buffer_[adr] >= mp_.clamp_min_log_ && md_.occupancy_buffer_inflate_[adr] == 0;
 }
 
-inline bool GridMap::isKnownOccupied(const Eigen::Vector3i& id) {
+inline bool GridMap::isKnownOccupied(const Eigen::Vector3i& id)
+{
   Eigen::Vector3i id1 = id;
   boundIndex(id1);
   int adr = toAddress(id1);
@@ -289,23 +307,28 @@ inline bool GridMap::isKnownOccupied(const Eigen::Vector3i& id) {
   return md_.occupancy_buffer_inflate_[adr] == 1;
 }
 
-inline void GridMap::setOccupied(Eigen::Vector3d pos) {
-  if (!isInMap(pos)) return;
+inline void GridMap::setOccupied(Eigen::Vector3d pos)
+{
+  if (!isInMap(pos))
+    return;
 
   Eigen::Vector3i id;
   posToIndex(pos, id);
 
-  md_.occupancy_buffer_inflate_[id(0) * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2) +
-                                id(1) * mp_.map_voxel_num_(2) + id(2)] = 1;
+  md_.occupancy_buffer_inflate_[id(0) * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2) + id(1) * mp_.map_voxel_num_(2) +
+                                id(2)] = 1;
 }
 
-inline void GridMap::setOccupancy(Eigen::Vector3d pos, double occ) {
-  if (occ != 1 && occ != 0) {
+inline void GridMap::setOccupancy(Eigen::Vector3d pos, double occ)
+{
+  if (occ != 1 && occ != 0)
+  {
     cout << "occ value error!" << endl;
     return;
   }
 
-  if (!isInMap(pos)) return;
+  if (!isInMap(pos))
+    return;
 
   Eigen::Vector3i id;
   posToIndex(pos, id);
@@ -313,8 +336,10 @@ inline void GridMap::setOccupancy(Eigen::Vector3d pos, double occ) {
   md_.occupancy_buffer_[toAddress(id)] = occ;
 }
 
-inline int GridMap::getOccupancy(Eigen::Vector3d pos) {
-  if (!isInMap(pos)) return -1;
+inline int GridMap::getOccupancy(Eigen::Vector3d pos)
+{
+  if (!isInMap(pos))
+    return -1;
 
   Eigen::Vector3i id;
   posToIndex(pos, id);
@@ -322,8 +347,10 @@ inline int GridMap::getOccupancy(Eigen::Vector3d pos) {
   return md_.occupancy_buffer_[toAddress(id)] > mp_.min_occupancy_log_ ? 1 : 0;
 }
 
-inline int GridMap::getInflateOccupancy(Eigen::Vector3d pos) {
-  if (!isInMap(pos)) return -1;
+inline int GridMap::getInflateOccupancy(Eigen::Vector3d pos)
+{
+  if (!isInMap(pos))
+    return -1;
 
   Eigen::Vector3i id;
   posToIndex(pos, id);
@@ -331,48 +358,59 @@ inline int GridMap::getInflateOccupancy(Eigen::Vector3d pos) {
   return int(md_.occupancy_buffer_inflate_[toAddress(id)]);
 }
 
-inline int GridMap::getOccupancy(Eigen::Vector3i id) {
-  if (id(0) < 0 || id(0) >= mp_.map_voxel_num_(0) || id(1) < 0 || id(1) >= mp_.map_voxel_num_(1) ||
-      id(2) < 0 || id(2) >= mp_.map_voxel_num_(2))
+inline int GridMap::getOccupancy(Eigen::Vector3i id)
+{
+  if (id(0) < 0 || id(0) >= mp_.map_voxel_num_(0) || id(1) < 0 || id(1) >= mp_.map_voxel_num_(1) || id(2) < 0 ||
+      id(2) >= mp_.map_voxel_num_(2))
     return -1;
 
   return md_.occupancy_buffer_[toAddress(id)] > mp_.min_occupancy_log_ ? 1 : 0;
 }
 
-inline bool GridMap::isInMap(const Eigen::Vector3d& pos) {
+inline bool GridMap::isInMap(const Eigen::Vector3d& pos)
+{
   if (pos(0) < mp_.map_min_boundary_(0) + 1e-4 || pos(1) < mp_.map_min_boundary_(1) + 1e-4 ||
-      pos(2) < mp_.map_min_boundary_(2) + 1e-4) {
+      pos(2) < mp_.map_min_boundary_(2) + 1e-4)
+  {
     // cout << "less than min range!" << endl;
     return false;
   }
   if (pos(0) > mp_.map_max_boundary_(0) - 1e-4 || pos(1) > mp_.map_max_boundary_(1) - 1e-4 ||
-      pos(2) > mp_.map_max_boundary_(2) - 1e-4) {
-        // cout << "greater than max range!" << endl;
+      pos(2) > mp_.map_max_boundary_(2) - 1e-4)
+  {
+    // cout << "greater than max range!" << endl;
     return false;
   }
   return true;
 }
 
-inline bool GridMap::isInMap(const Eigen::Vector3i& idx) {
-  if (idx(0) < 0 || idx(1) < 0 || idx(2) < 0) {
+inline bool GridMap::isInMap(const Eigen::Vector3i& idx)
+{
+  if (idx(0) < 0 || idx(1) < 0 || idx(2) < 0)
+  {
     return false;
   }
-  if (idx(0) > mp_.map_voxel_num_(0) - 1 || idx(1) > mp_.map_voxel_num_(1) - 1 ||
-      idx(2) > mp_.map_voxel_num_(2) - 1) {
+  if (idx(0) > mp_.map_voxel_num_(0) - 1 || idx(1) > mp_.map_voxel_num_(1) - 1 || idx(2) > mp_.map_voxel_num_(2) - 1)
+  {
     return false;
   }
   return true;
 }
 
-inline void GridMap::posToIndex(const Eigen::Vector3d& pos, Eigen::Vector3i& id) {
-  for (int i = 0; i < 3; ++i) id(i) = floor((pos(i) - mp_.map_origin_(i)) * mp_.resolution_inv_);
+inline void GridMap::posToIndex(const Eigen::Vector3d& pos, Eigen::Vector3i& id)
+{
+  for (int i = 0; i < 3; ++i)
+    id(i) = floor((pos(i) - mp_.map_origin_(i)) * mp_.resolution_inv_);
 }
 
-inline void GridMap::indexToPos(const Eigen::Vector3i& id, Eigen::Vector3d& pos) {
-  for (int i = 0; i < 3; ++i) pos(i) = (id(i) + 0.5) * mp_.resolution_ + mp_.map_origin_(i);
+inline void GridMap::indexToPos(const Eigen::Vector3i& id, Eigen::Vector3d& pos)
+{
+  for (int i = 0; i < 3; ++i)
+    pos(i) = (id(i) + 0.5) * mp_.resolution_ + mp_.map_origin_(i);
 }
 
-inline void GridMap::inflatePoint(const Eigen::Vector3i& pt, int step, vector<Eigen::Vector3i>& pts) {
+inline void GridMap::inflatePoint(const Eigen::Vector3i& pt, int step, vector<Eigen::Vector3i>& pts)
+{
   int num = 0;
 
   /* ---------- + shape inflate ---------- */
@@ -396,12 +434,15 @@ inline void GridMap::inflatePoint(const Eigen::Vector3i& pt, int step, vector<Ei
   /* ---------- all inflate ---------- */
   for (int x = -step; x <= step; ++x)
     for (int y = -step; y <= step; ++y)
-      for (int z = -step; z <= step; ++z) {
+      for (int z = -step; z <= step; ++z)
+      {
         pts[num++] = Eigen::Vector3i(pt(0) + x, pt(1) + y, pt(2) + z);
       }
 }
 
-
-inline double GridMap::getResolution() { return mp_.resolution_; }
+inline double GridMap::getResolution()
+{
+  return mp_.resolution_;
+}
 
 #endif

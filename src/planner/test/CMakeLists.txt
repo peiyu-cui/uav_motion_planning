@@ -58,6 +58,7 @@ add_executable(test_astar_node src/test_astar.cpp)
 add_executable(test_rrt_node src/test_rrt.cpp)
 add_executable(test_rrt_star_node src/test_rrt_star.cpp)
 add_executable(test_kino_astar_node src/test_kino_astar.cpp)
+
 add_executable(test_astar_searching src/test_astar_searching.cpp)
 add_executable(test_rrt_searching src/test_rrt_searching.cpp)
 add_executable(test_rrt_star_searching src/test_rrt_star_searching.cpp)

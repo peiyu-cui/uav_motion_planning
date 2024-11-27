@@ -2,56 +2,56 @@
 <launch>
 
   <node name="test_rrt_searching" pkg="test" type="test_rrt_searching" output="screen">
-    <param name="grid_map/resolution" value="0.1"/>
-    <param name="grid_map/map_size_x"   value="40.0" /> 
-    <param name="grid_map/map_size_y"   value="20.0" /> 
-    <param name="grid_map/map_size_z"   value="3.0" /> 
-    <param name="grid_map/local_update_range_x"  value="40.0" /> 
-    <param name="grid_map/local_update_range_y"  value="20.0" /> 
-    <param name="grid_map/local_update_range_z"  value="3.0" /> 
-    <param name="grid_map/obstacles_inflation"     value="0.099" /> 
-    <param name="grid_map/local_map_margin" value="30"/>
-    <param name="grid_map/ground_height"        value="-0.01"/>
+    <param name="grid_map/resolution" value="0.1" />
+    <param name="grid_map/map_size_x" value="40.0" />
+    <param name="grid_map/map_size_y" value="20.0" />
+    <param name="grid_map/map_size_z" value="3.0" />
+    <param name="grid_map/local_update_range_x" value="40.0" />
+    <param name="grid_map/local_update_range_y" value="20.0" />
+    <param name="grid_map/local_update_range_z" value="3.0" />
+    <param name="grid_map/obstacles_inflation" value="0.099" />
+    <param name="grid_map/local_map_margin" value="30" />
+    <param name="grid_map/ground_height" value="-0.01" />
     <!-- camera parameter -->
-    <param name="grid_map/cx" value="321.04638671875"/>
-    <param name="grid_map/cy" value="243.44969177246094"/>
-    <param name="grid_map/fx" value="387.229248046875"/>
-    <param name="grid_map/fy" value="387.229248046875"/>
+    <param name="grid_map/cx" value="321.04638671875" />
+    <param name="grid_map/cy" value="243.44969177246094" />
+    <param name="grid_map/fx" value="387.229248046875" />
+    <param name="grid_map/fy" value="387.229248046875" />
     <!-- depth filter -->
-    <param name="grid_map/use_depth_filter" value="true"/>
-    <param name="grid_map/depth_filter_tolerance" value="0.15"/>
-    <param name="grid_map/depth_filter_maxdist"   value="5.0"/>
-    <param name="grid_map/depth_filter_mindist"   value="0.2"/>
-    <param name="grid_map/depth_filter_margin"    value="1"/>
-    <param name="grid_map/k_depth_scaling_factor" value="1000.0"/>
-    <param name="grid_map/skip_pixel" value="2"/>
+    <param name="grid_map/use_depth_filter" value="true" />
+    <param name="grid_map/depth_filter_tolerance" value="0.15" />
+    <param name="grid_map/depth_filter_maxdist" value="5.0" />
+    <param name="grid_map/depth_filter_mindist" value="0.2" />
+    <param name="grid_map/depth_filter_margin" value="1" />
+    <param name="grid_map/k_depth_scaling_factor" value="1000.0" />
+    <param name="grid_map/skip_pixel" value="2" />
     <!-- local fusion -->
-    <param name="grid_map/p_hit"  value="0.65"/>
-    <param name="grid_map/p_miss" value="0.35"/>
-    <param name="grid_map/p_min"  value="0.12"/>
-    <param name="grid_map/p_max"  value="0.90"/>
-    <param name="grid_map/p_occ"  value="0.80"/>
-    <param name="grid_map/min_ray_length" value="0.1"/>
-    <param name="grid_map/max_ray_length" value="4.5"/>
+    <param name="grid_map/p_hit" value="0.65" />
+    <param name="grid_map/p_miss" value="0.35" />
+    <param name="grid_map/p_min" value="0.12" />
+    <param name="grid_map/p_max" value="0.90" />
+    <param name="grid_map/p_occ" value="0.80" />
+    <param name="grid_map/min_ray_length" value="0.1" />
+    <param name="grid_map/max_ray_length" value="4.5" />
 
-    <param name="grid_map/virtual_ceil_height"   value="2.5"/>
-    <param name="grid_map/visualization_truncate_height"   value="2.4"/>
-    <param name="grid_map/show_occ_time"  value="false"/>
-    <param name="grid_map/pose_type"     value="2"/>  
-    <param name="grid_map/frame_id"      value="world"/>
+    <param name="grid_map/virtual_ceil_height" value="2.5" />
+    <param name="grid_map/visualization_truncate_height" value="2.4" />
+    <param name="grid_map/show_occ_time" value="false" />
+    <param name="grid_map/pose_type" value="2" />
+    <param name="grid_map/frame_id" value="world" />
 
     <!-- rrt parameters -->
-    <param name="rrt/max_tree_node_num" value="100000"/>
-    <param name="rrt/step_length" value="0.5"/>
-    <param name="rrt/max_allowed_time" value="5"/>
-    <param name="rrt/search_radius" value="1.0"/>
-    <param name="rrt/collision_check_resolution" value="0.1"/>
-    
+    <param name="rrt/max_tree_node_num" value="100000" />
+    <param name="rrt/step_length" value="0.5" />
+    <param name="rrt/max_allowed_time" value="5" />
+    <param name="rrt/search_radius" value="1.0" />
+    <param name="rrt/collision_check_resolution" value="0.1" />
+
 
     <!-- local cloud lidar not use cuda-->
-    <remap from="/grid_map/cloud" to="/pcl_render_node/cloud"/>
-    <remap from="/grid_map/odom" to="/visual_slam/odom"/>
-    
+    <remap from="/grid_map/cloud" to="/pcl_render_node/cloud" />
+    <remap from="/grid_map/odom" to="/visual_slam/odom" />
+
     <!-- depth camera type = 1 use cuda-->
     <!-- <remap from="/grid_map/depth" to="/pcl_render_node/depth"/> 
     <remap from="/grid_map/pose" to="/pcl_render_node/camera_pose"/> -->
@@ -61,6 +61,6 @@
     <remap from="/grid_map/odom" to="/visual_slam/odom"/> -->
 
   </node>
-  
+
 
 </launch>

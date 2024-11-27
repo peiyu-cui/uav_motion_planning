@@ -68,7 +68,7 @@ void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
   astar_->reset();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test_astar_searching");
   ros::NodeHandle nh("~");
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
   GridMap::Ptr grid_map = std::make_shared<GridMap>();
   grid_map->initMap(nh);
-  
+
   astar_ = std::make_shared<path_searching::Astar>();
 
   astar_->setParam(nh);
@@ -88,5 +88,6 @@ int main(int argc, char **argv)
   astar_->init();
 
   ros::spin();
+
   return 0;
 }

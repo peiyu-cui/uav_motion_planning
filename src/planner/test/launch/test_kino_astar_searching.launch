@@ -51,7 +51,7 @@
     <param name="kino_astar/acc_resolution" value="4.0"/>
     <param name="kino_astar/sample_tau" value="0.3"/>
     <!-- collision check type 1: kino_astar, 2: kino_se3 -->
-    <param name="kino_astar/collision_check_type" value="2"/>
+    <param name="kino_astar/collision_check_type" value="1"/>
     <!-- robot ellipsoid parameters -->
     <param name="kino_se3/robot_r" value="0.4"/>
     <param name="kino_se3/robot_h" value="0.1"/>

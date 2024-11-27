@@ -17,11 +17,11 @@ void KinoAstar::setParam(ros::NodeHandle& nh)
   nh.param("kino_astar/sample_tau", sample_tau_, 0.5);
   nh.param("kino_se3/robot_r", robot_r_, 0.2);
   nh.param("kino_se3/robot_h", robot_h_, 0.1);
-    
+
   local_cloud_sub_ = nh.subscribe<sensor_msgs::PointCloud2>("local_cloud", 10, &KinoAstar::localCloudCallback, this);
   path_node_pub_ = nh.advertise<visualization_msgs::Marker>("kino_astar_path_nodes", 1);
   elliposid_pub_ = nh.advertise<visualization_msgs::Marker>("elliposid", 300);
-  
+
   path_node_marker_.header.frame_id = "world";
   path_node_marker_.type = visualization_msgs::Marker::SPHERE_LIST;
   path_node_marker_.action = visualization_msgs::Marker::ADD;
@@ -33,26 +33,25 @@ void KinoAstar::setParam(ros::NodeHandle& nh)
   path_node_marker_.color.r = 1.0;
   path_node_marker_.color.g = 0.0;
   path_node_marker_.color.b = 0.0;
-
 }
 
 void KinoAstar::localCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-    // insert local cloud to kdtree_
-    // std::cout << "local cloud callback" << std::endl;
-    obs_.clear();
-    PCLPointCloud latest_cloud;
-    pcl::fromROSMsg(*msg, latest_cloud);
-    for (size_t i = 0; i < latest_cloud.points.size(); ++i)
-    {
-        Eigen::Vector3d pt;
-        pt(0) = latest_cloud.points[i].x;
-        pt(1) = latest_cloud.points[i].y;
-        pt(2) = latest_cloud.points[i].z;
-        obs_.push_back(pt);
-    }
-    PCLPointCloud::Ptr cloud_ptr = boost::make_shared<PCLPointCloud>(toPCL(obs_));
-    kdtree_.setInputCloud(cloud_ptr);
+  // insert local cloud to kdtree_
+  // std::cout << "local cloud callback" << std::endl;
+  obs_.clear();
+  PCLPointCloud latest_cloud;
+  pcl::fromROSMsg(*msg, latest_cloud);
+  for (size_t i = 0; i < latest_cloud.points.size(); ++i)
+  {
+    Eigen::Vector3d pt;
+    pt(0) = latest_cloud.points[i].x;
+    pt(1) = latest_cloud.points[i].y;
+    pt(2) = latest_cloud.points[i].z;
+    obs_.push_back(pt);
+  }
+  PCLPointCloud::Ptr cloud_ptr = boost::make_shared<PCLPointCloud>(toPCL(obs_));
+  kdtree_.setInputCloud(cloud_ptr);
 }
 
 void KinoAstar::init()
@@ -79,9 +78,8 @@ void KinoAstar::setGridMap(GridMap::Ptr& grid_map)
   this->grid_map_ = grid_map;
 }
 
-int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
-         Eigen::Vector3d end_pt, Eigen::Vector3d end_vel,
-         std::vector<Eigen::Vector3d>& path)
+int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel, Eigen::Vector3d end_pt,
+                      Eigen::Vector3d end_vel, std::vector<Eigen::Vector3d>& path)
 {
   ros::Time start_time = ros::Time::now();
   double inv_acc_res_ = 1.0 / acc_res_;
@@ -114,7 +112,8 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
     if ((current_node->position - end_pt).norm() < goal_tolerance_)
     {
       double tmp_cost = lambda_heu_ * (current_node->position, current_node->velocity, end_pt, end_vel, optimal_time);
-      bool shot_path_found = computeShotTraj(current_node->position, current_node->velocity, end_pt, end_vel, optimal_time);
+      bool shot_path_found =
+          computeShotTraj(current_node->position, current_node->velocity, end_pt, end_vel, optimal_time);
       // std::cout << "optimal_time: " << optimal_time << std::endl;
       if (shot_path_found)
       {
@@ -128,17 +127,17 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
         visPathNodes(path_nodes_list);
         switch (collision_check_type_)
         {
-          case 1: // grid map check
+          case 1:  // grid map check
           {
             samplePath(path_pool, path);
             break;
           }
-          case 2: // local cloud check
+          case 2:  // local cloud check
           {
             sampleEllipsoid(path_pool, path, rot_list);
             visEllipsoid(path, rot_list);
             break;
-          }  
+          }
         }
         return REACH_END;
       }
@@ -149,9 +148,9 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
       else
       {
         std::cout << "no shot path found, end searching" << std::endl;
-        return NO_PATH_FOUND;   
+        return NO_PATH_FOUND;
       }
-      // else continue;  
+      // else continue;
     }
 
     // expand current node
@@ -184,14 +183,14 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
             // check collision
             switch (collision_check_type_)
             {
-              case 1: // grid map check
+              case 1:  // grid map check
                 if (grid_map_->getInflateOccupancy(tmp_pos) == 1)
                 {
                   collision_flag = true;
                   break;
                 }
-              
-              case 2: // local cloud check
+
+              case 2:  // local cloud check
                 if (isCollisionFree(tmp_pos, ut) == false)
                 {
                   collision_flag = true;
@@ -204,15 +203,15 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
               break;
             }
             // check velocity limit
-            if (xt.tail(3)(0) < -max_vel_ || xt.tail(3)(0) > max_vel_ 
-                || xt.tail(3)(1) < -max_vel_ || xt.tail(3)(1) > max_vel_ 
-                || xt.tail(3)(2) < -max_vel_ || xt.tail(3)(2) > max_vel_)
-              {
-                flag = true;
-                break;
-              }
+            if (xt.tail(3)(0) < -max_vel_ || xt.tail(3)(0) > max_vel_ || xt.tail(3)(1) < -max_vel_ ||
+                xt.tail(3)(1) > max_vel_ || xt.tail(3)(2) < -max_vel_ || xt.tail(3)(2) > max_vel_)
+            {
+              flag = true;
+              break;
+            }
           }
-          if (flag) continue;
+          if (flag)
+            continue;
 
           StateTransit(x0, xt, ut, sample_tau_);
           // std::cout << "xt: " << xt.head(3).transpose() << std::endl;
@@ -230,7 +229,8 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
             pro_node->velocity = xt.tail(3);
             pro_node->index = posToIndex(xt.head(3));
             pro_node->g_cost = current_node->g_cost + (ut.dot(ut) + rou_) * sample_tau_;
-            pro_node->f_cost = pro_node->g_cost + lambda_heu_ * getHeuristicCost(pro_node->position, pro_node->velocity, end_pt, end_vel, optimal_time);
+            pro_node->f_cost = pro_node->g_cost + lambda_heu_ * getHeuristicCost(pro_node->position, pro_node->velocity,
+                                                                                 end_pt, end_vel, optimal_time);
             pro_node->parent = current_node;
             pro_node->input = ut;
             pro_node->duration = sample_tau_;
@@ -257,23 +257,22 @@ int KinoAstar::search(Eigen::Vector3d start_pt, Eigen::Vector3d start_vel,
               old_node->velocity = xt.tail(3);
               // old_node->index = posToIndex(xt.head(3));
               old_node->g_cost = tmp_g_cost;
-              old_node->f_cost = old_node->g_cost + lambda_heu_ * getHeuristicCost(old_node->position, old_node->velocity, end_pt, end_vel, optimal_time);
+              old_node->f_cost =
+                  old_node->g_cost +
+                  lambda_heu_ * getHeuristicCost(old_node->position, old_node->velocity, end_pt, end_vel, optimal_time);
               old_node->parent = current_node;
               old_node->input = ut;
             }
           }
         }
-
   }
 
   std::cout << "open_list is empty, end searching, no path found" << std::endl;
   return NO_PATH_FOUND;
 }
 
-
 void KinoAstar::reset()
 {
-
   for (int i = 0; i < use_node_num_; i++)
   {
     KinoAstarNodePtr node = path_node_pool_[i];
@@ -298,9 +297,7 @@ void KinoAstar::reset()
   path_node_pool_.clear();
 
   use_node_num_ = 0;
-
 }
-
 
 Eigen::Vector3i KinoAstar::posToIndex(Eigen::Vector3d pos)
 {
@@ -312,9 +309,8 @@ Eigen::Vector3i KinoAstar::posToIndex(Eigen::Vector3d pos)
   return index;
 }
 
-double KinoAstar::getHeuristicCost(Eigen::Vector3d x1, Eigen::Vector3d v1,
-                        Eigen::Vector3d x2, Eigen::Vector3d v2,
-                        double &optimal_time)
+double KinoAstar::getHeuristicCost(Eigen::Vector3d x1, Eigen::Vector3d v1, Eigen::Vector3d x2, Eigen::Vector3d v2,
+                                   double& optimal_time)
 {
   Eigen::Vector3d dp = x2 - x1;
   double optimal_cost = inf;
@@ -338,7 +334,6 @@ double KinoAstar::getHeuristicCost(Eigen::Vector3d x1, Eigen::Vector3d v1,
     }
   }
   return tie_breaker_ * optimal_cost;
-
 }
 
 std::vector<double> KinoAstar::cubic(double a, double b, double c, double d)
@@ -418,9 +413,8 @@ std::vector<double> KinoAstar::quartic(double a, double b, double c, double d, d
   return dts;
 }
 
-bool KinoAstar::computeShotTraj(Eigen::Vector3d x1, Eigen::Vector3d v1,
-                            Eigen::Vector3d x2, Eigen::Vector3d v2,
-                            double optimal_time)
+bool KinoAstar::computeShotTraj(Eigen::Vector3d x1, Eigen::Vector3d v1, Eigen::Vector3d x2, Eigen::Vector3d v2,
+                                double optimal_time)
 {
   double td = optimal_time;
   Eigen::Vector3d dp = x2 - x1;
@@ -428,18 +422,12 @@ bool KinoAstar::computeShotTraj(Eigen::Vector3d x1, Eigen::Vector3d v1,
   shot_coef_.col(0) = x1;
   shot_coef_.col(1) = v1;
   shot_coef_.col(2) = 0.5 * (6 / (td * td) * (dp - v1 * td) - 2 * dv / td);
-  shot_coef_.col(3) = 1.0 / 6.0 * (-12 / (td * td *td) * (dp - v1 * td) + 6 * dv / (td * td));
+  shot_coef_.col(3) = 1.0 / 6.0 * (-12 / (td * td * td) * (dp - v1 * td) + 6 * dv / (td * td));
 
   Eigen::Matrix<double, 4, 4> Transit_v;
-  Transit_v << 0, 0, 0, 0, 
-             1, 0, 0, 0,
-             0, 2, 0, 0, 
-             0, 0, 3, 0;
+  Transit_v << 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0;
   Eigen::Matrix<double, 4, 4> Transit_a;
-  Transit_a << 0, 0, 0, 0, 
-             1, 0, 0, 0,
-             0, 2, 0, 0, 
-             0, 0, 0, 0;
+  Transit_a << 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0;
   vel_coef_ = shot_coef_ * Transit_v;
   acc_coef_ = vel_coef_ * Transit_a;
 
@@ -465,15 +453,15 @@ bool KinoAstar::computeShotTraj(Eigen::Vector3d x1, Eigen::Vector3d v1,
     }
     // only check collision, vel and acc limit by limit T_
     // // check velocity limit
-    // if (shot_vel(0) > max_vel_ || shot_vel(0) < -max_vel_ || 
-    //     shot_vel(1) > max_vel_ || shot_vel(1) < -max_vel_ || 
+    // if (shot_vel(0) > max_vel_ || shot_vel(0) < -max_vel_ ||
+    //     shot_vel(1) > max_vel_ || shot_vel(1) < -max_vel_ ||
     //     shot_vel(2) > max_vel_ || shot_vel(2) < -max_vel_)
     // {
     //   return false;
     // }
     // // check acceleration limit
-    // if (shot_acc(0) > max_accel_ || shot_acc(0) < -max_accel_ || 
-    //     shot_acc(1) > max_accel_ || shot_acc(1) < -max_accel_ || 
+    // if (shot_acc(0) > max_accel_ || shot_acc(0) < -max_accel_ ||
+    //     shot_acc(1) > max_accel_ || shot_acc(1) < -max_accel_ ||
     //     shot_acc(2) > max_accel_ || shot_acc(2) < -max_accel_)
     // {
     //   return false;
@@ -482,7 +470,8 @@ bool KinoAstar::computeShotTraj(Eigen::Vector3d x1, Eigen::Vector3d v1,
   return true;
 }
 
-std::vector<KinoAstarNodePtr> KinoAstar::retrievePath(KinoAstarNodePtr end_node, std::vector<Eigen::Vector3d>& path_nodes_list)
+std::vector<KinoAstarNodePtr> KinoAstar::retrievePath(KinoAstarNodePtr end_node,
+                                                      std::vector<Eigen::Vector3d>& path_nodes_list)
 {
   KinoAstarNodePtr current_node = end_node;
   std::vector<KinoAstarNodePtr> path_nodes;
@@ -565,11 +554,10 @@ void KinoAstar::samplePath(std::vector<KinoAstarNodePtr> path_pool, std::vector<
       path.push_back(shot_pos);
     }
   }
-
 }
 
-void KinoAstar::sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::vector<Eigen::Vector3d>& path, 
-                                std::vector<Eigen::Matrix3d> &rot_list)
+void KinoAstar::sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::vector<Eigen::Vector3d>& path,
+                                std::vector<Eigen::Matrix3d>& rot_list)
 {
   if (path_pool.size() != 1)
   {
@@ -587,9 +575,9 @@ void KinoAstar::sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::ve
         curr_t = j * step_size_;
         StateTransit(x0, xt, next_node->input, curr_t);
         path.push_back(xt.head(3));
-        
+
         Eigen::Vector3d b3 = (next_node->input + 9.81 * Eigen::Vector3d::UnitZ()).normalized();
-        Eigen::Vector3d c1 (cos(0), sin(0), 0);
+        Eigen::Vector3d c1(cos(0), sin(0), 0);
         Eigen::Vector3d b2 = b3.cross(c1).normalized();
         Eigen::Vector3d b1 = b2.cross(b3).normalized();
 
@@ -599,35 +587,34 @@ void KinoAstar::sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::ve
       }
     }
 
-       KinoAstarNodePtr last_node = path_pool.back();
-       double td = last_node->duration;
+    KinoAstarNodePtr last_node = path_pool.back();
+    double td = last_node->duration;
 
-       Eigen::Matrix<double, 4, 1> t_vector;
+    Eigen::Matrix<double, 4, 1> t_vector;
 
-       int segment_num = std::floor(td / step_size_);
-       double curr_t = 0.0;
-       for (int j = 0; j <= segment_num; j++)
-       {
-         curr_t = j * step_size_;
-         for (int i = 0; i < 4; i++)
-         {
-          t_vector(i) = pow(curr_t, i);
-         }
+    int segment_num = std::floor(td / step_size_);
+    double curr_t = 0.0;
+    for (int j = 0; j <= segment_num; j++)
+    {
+      curr_t = j * step_size_;
+      for (int i = 0; i < 4; i++)
+      {
+        t_vector(i) = pow(curr_t, i);
+      }
 
-        Eigen::Vector3d shot_pos = shot_coef_ * t_vector;
-        Eigen::Vector3d shot_acc = acc_coef_ * t_vector;
-        path.push_back(shot_pos);
+      Eigen::Vector3d shot_pos = shot_coef_ * t_vector;
+      Eigen::Vector3d shot_acc = acc_coef_ * t_vector;
+      path.push_back(shot_pos);
 
-         Eigen::Vector3d b3 = (shot_acc + 9.81 * Eigen::Vector3d::UnitZ()).normalized();
-         Eigen::Vector3d c1 (cos(0), sin(0), 0);
-         Eigen::Vector3d b2 = b3.cross(c1).normalized();
-         Eigen::Vector3d b1 = b2.cross(b3).normalized();
+      Eigen::Vector3d b3 = (shot_acc + 9.81 * Eigen::Vector3d::UnitZ()).normalized();
+      Eigen::Vector3d c1(cos(0), sin(0), 0);
+      Eigen::Vector3d b2 = b3.cross(c1).normalized();
+      Eigen::Vector3d b1 = b2.cross(b3).normalized();
 
-         Eigen::Matrix3d Rot;
-         Rot << b1, b2, b3;
-         rot_list.push_back(Rot);
-       
-       }
+      Eigen::Matrix3d Rot;
+      Rot << b1, b2, b3;
+      rot_list.push_back(Rot);
+    }
   }
   else
   {
@@ -650,7 +637,7 @@ void KinoAstar::sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::ve
       Eigen::Vector3d shot_acc = acc_coef_ * t_vector;
       path.push_back(shot_pos);
       Eigen::Vector3d b3 = (shot_acc + 9.81 * Eigen::Vector3d::UnitZ()).normalized();
-      Eigen::Vector3d c1 (cos(0), sin(0), 0);
+      Eigen::Vector3d c1(cos(0), sin(0), 0);
       Eigen::Vector3d b2 = b3.cross(c1).normalized();
       Eigen::Vector3d b1 = b2.cross(b3).normalized();
 
@@ -661,7 +648,8 @@ void KinoAstar::sampleEllipsoid(std::vector<KinoAstarNodePtr> path_pool, std::ve
   }
 }
 
-void KinoAstar::StateTransit(Eigen::Matrix<double, 6, 1> &x0, Eigen::Matrix<double, 6, 1> &xt, Eigen::Vector3d ut, double t)
+void KinoAstar::StateTransit(Eigen::Matrix<double, 6, 1>& x0, Eigen::Matrix<double, 6, 1>& xt, Eigen::Vector3d ut,
+                             double t)
 {
   Eigen::Matrix<double, 6, 6> e_At = Eigen::Matrix<double, 6, 6>::Identity();
   for (int i = 0; i < 3; i++)
@@ -672,12 +660,13 @@ void KinoAstar::StateTransit(Eigen::Matrix<double, 6, 1> &x0, Eigen::Matrix<doub
   Eigen::Matrix<double, 6, 3> Integral = Eigen::Matrix<double, 6, 3>::Zero();
   for (int i = 0; i < 6; i++)
   {
-    if (i < 3) Integral(i, i) = 0.5 * t * t;
-    else Integral(i, i - 3) = t;
+    if (i < 3)
+      Integral(i, i) = 0.5 * t * t;
+    else
+      Integral(i, i - 3) = t;
   }
 
   xt = e_At * x0 + Integral * ut;
-
 }
 
 void KinoAstar::visPathNodes(std::vector<Eigen::Vector3d>& path_nodes_list)
@@ -695,7 +684,7 @@ void KinoAstar::visPathNodes(std::vector<Eigen::Vector3d>& path_nodes_list)
   path_node_pub_.publish(path_node_marker_);
 }
 
-void KinoAstar::visEllipsoid(std::vector<Eigen::Vector3d>& path_nodes_list, std::vector<Eigen::Matrix3d> &rot_list)
+void KinoAstar::visEllipsoid(std::vector<Eigen::Vector3d>& path_nodes_list, std::vector<Eigen::Matrix3d>& rot_list)
 {
   for (int i = 0; i < path_nodes_list.size(); i++)
   {
@@ -714,11 +703,11 @@ void KinoAstar::visEllipsoid(std::vector<Eigen::Vector3d>& path_nodes_list, std:
     elliposid_marker_.scale.x = 0.4 * 2;
     elliposid_marker_.scale.y = 0.4 * 2;
     elliposid_marker_.scale.z = 0.1 * 2;
-    
+
     elliposid_marker_.pose.position.x = path_nodes_list[i](0);
     elliposid_marker_.pose.position.y = path_nodes_list[i](1);
     elliposid_marker_.pose.position.z = path_nodes_list[i](2);
-  
+
     Eigen::Quaterniond q(rot_list[i]);
     elliposid_marker_.pose.orientation.x = q.x();
     elliposid_marker_.pose.orientation.y = q.y();
@@ -727,63 +716,62 @@ void KinoAstar::visEllipsoid(std::vector<Eigen::Vector3d>& path_nodes_list, std:
 
     elliposid_pub_.publish(elliposid_marker_);
   }
-
-  
 }
 
 bool KinoAstar::isCollisionFree(Eigen::Vector3d pt, Eigen::Vector3d acc)
 {
-    // check collision with local cloud
-    Eigen::Vector3d b3 = (acc + 9.81 * Eigen::Vector3d::UnitZ()).normalized();
-    Eigen::Vector3d c1 (cos(0), sin(0), 0);
-    Eigen::Vector3d b2 = b3.cross(c1).normalized();
-    Eigen::Vector3d b1 = b2.cross(b3).normalized();
+  // check collision with local cloud
+  Eigen::Vector3d b3 = (acc + 9.81 * Eigen::Vector3d::UnitZ()).normalized();
+  Eigen::Vector3d c1(cos(0), sin(0), 0);
+  Eigen::Vector3d b2 = b3.cross(c1).normalized();
+  Eigen::Vector3d b1 = b2.cross(b3).normalized();
 
-    Eigen::Matrix3d Rot;
-    Rot << b1, b2, b3;
+  Eigen::Matrix3d Rot;
+  Rot << b1, b2, b3;
 
-    Eigen::Matrix3d P = Eigen::Matrix3d::Zero();
-    P(0, 0) = robot_r_;
-    P(1, 1) = robot_r_;
-    P(2, 2) = robot_h_;
+  Eigen::Matrix3d P = Eigen::Matrix3d::Zero();
+  P(0, 0) = robot_r_;
+  P(1, 1) = robot_r_;
+  P(2, 2) = robot_h_;
 
-    Eigen::Matrix3d E = Rot * P * Rot.transpose();
+  Eigen::Matrix3d E = Rot * P * Rot.transpose();
 
-    pcl::PointXYZ searchPoint;
-    std::vector<int> pointIdxRadiusSearch;
-    std::vector<float> pointRadiusSquaredDistance;
+  pcl::PointXYZ searchPoint;
+  std::vector<int> pointIdxRadiusSearch;
+  std::vector<float> pointRadiusSquaredDistance;
 
-    searchPoint.x = pt(0);
-    searchPoint.y = pt(1);
-    searchPoint.z = pt(2);
+  searchPoint.x = pt(0);
+  searchPoint.y = pt(1);
+  searchPoint.z = pt(2);
 
-    float radius = robot_r_ + 1e-1;
-    if (kdtree_.radiusSearch(searchPoint, radius, pointIdxRadiusSearch,
-        pointRadiusSquaredDistance) > 0)
+  float radius = robot_r_ + 1e-1;
+  if (kdtree_.radiusSearch(searchPoint, radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) > 0)
+  {
+    for (size_t i = 0; i < pointIdxRadiusSearch.size(); ++i)
     {
-        for (size_t i = 0; i < pointIdxRadiusSearch.size(); ++i)
-        {
-            Eigen::Vector3d tmp_pt = E.inverse() * (obs_[pointIdxRadiusSearch[i]] - pt);
-            if (tmp_pt.norm() <= 1.0) return false;
-        }
+      Eigen::Vector3d tmp_pt = E.inverse() * (obs_[pointIdxRadiusSearch[i]] - pt);
+      if (tmp_pt.norm() <= 1.0)
+        return false;
     }
-    return true;
+  }
+  return true;
 }
 
 // Convert obstacle points into pcl point cloud
-PCLPointCloud KinoAstar::toPCL(const std::vector<Eigen::Vector3d> &obs) {
-    PCLPointCloud cloud;
-    cloud.width = obs.size();
-    cloud.height = 1;
-    cloud.points.resize(cloud.width * cloud.height);
-    for (unsigned int i = 0; i < obs.size(); i++) {
-      cloud.points[i].x = obs[i](0);
-      cloud.points[i].y = obs[i](1);
-      cloud.points[i].z = obs[i](2);
-    }
-    return cloud;
+PCLPointCloud KinoAstar::toPCL(const std::vector<Eigen::Vector3d>& obs)
+{
+  PCLPointCloud cloud;
+  cloud.width = obs.size();
+  cloud.height = 1;
+  cloud.points.resize(cloud.width * cloud.height);
+  for (unsigned int i = 0; i < obs.size(); i++)
+  {
+    cloud.points[i].x = obs[i](0);
+    cloud.points[i].y = obs[i](1);
+    cloud.points[i].z = obs[i](2);
   }
-
+  return cloud;
+}
 
 KinoAstar::~KinoAstar()
 {
@@ -793,4 +781,4 @@ KinoAstar::~KinoAstar()
   }
 }
 
-} // namespace path_searching
+}  // namespace path_searching

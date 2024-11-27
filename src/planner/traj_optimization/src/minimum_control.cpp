@@ -151,11 +151,11 @@ bool MinimumControl::solve(Eigen::VectorXd& pos_1d,
     getConstraintMatrix(time_vec);
     getBound(pos_1d, bound_vel, bound_acc);
 
-    // std::cout << "P: " << P_ << std::endl;
-    // std::cout << "q: " << q_.transpose() << std::endl;
-    // std::cout << "A: " << A_ << std::endl;
-    // std::cout << "lb: " << lb_.transpose() << std::endl;
-    // std::cout << "ub: " << ub_.transpose() << std::endl;
+    std::cout << "P: " << P_ << std::endl;
+    std::cout << "q: " << q_.transpose() << std::endl;
+    std::cout << "A: " << A_ << std::endl;
+    std::cout << "lb: " << lb_.transpose() << std::endl;
+    std::cout << "ub: " << ub_.transpose() << std::endl;
 
     solver_.settings()->setWarmStart(true);
     solver_.settings()->setPrimalInfeasibilityTollerance(1e-3);
