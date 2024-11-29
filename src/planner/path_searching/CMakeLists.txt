@@ -24,18 +24,15 @@ set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES path_searching
+ LIBRARIES path_searching kdtree
  CATKIN_DEPENDS plan_env
- LIBRARIES plan_env
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-#  DEPENDS system_lib
+ DEPENDS PCL
 )
 
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  SYSTEM 
   include 
   ${catkin_INCLUDE_DIRS}
   ${Eigen3_INCLUDE_DIRS}
@@ -45,19 +42,18 @@ include_directories(
 
 link_directories(${PCL_LIBRARY_DIRS})
 
+add_library(kdtree
+  src/kdtree/kdtree.cpp
+)
 
 add_library(path_searching
   src/a_star.cpp
   src/rrt.cpp
   src/rrt_star.cpp
-  src/kino_astar.cpp)
+  src/kino_astar.cpp
+)
 
 target_link_libraries(path_searching
   ${catkin_LIBRARYS}
   kdtree
-  )
-
-add_library(kdtree
-  src/kdtree/kdtree.cpp)
-
-
+)
