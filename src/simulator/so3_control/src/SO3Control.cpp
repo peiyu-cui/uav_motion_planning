@@ -18,22 +18,18 @@ void SO3Control::setGravity(const double g)
   g_ = g;
 }
 
-void SO3Control::setPosition(const Eigen::Vector3d &position)
+void SO3Control::setPosition(const Eigen::Vector3d& position)
 {
   pos_ = position;
 }
 
-void SO3Control::setVelocity(const Eigen::Vector3d &velocity)
+void SO3Control::setVelocity(const Eigen::Vector3d& velocity)
 {
   vel_ = velocity;
 }
 
-void SO3Control::calculateControl(const Eigen::Vector3d &des_pos,
-                                  const Eigen::Vector3d &des_vel,
-                                  const Eigen::Vector3d &des_acc,
-                                  const double des_yaw, const double des_yaw_dot,
-                                  const Eigen::Vector3d &kx,
-                                  const Eigen::Vector3d &kv)
+void SO3Control::calculateControl(const Eigen::Vector3d& des_pos, const Eigen::Vector3d& des_vel, const Eigen::Vector3d& des_acc,
+                                  const double des_yaw, const double des_yaw_dot, const Eigen::Vector3d& kx, const Eigen::Vector3d& kv)
 {
   bool flag_use_pos = !(std::isnan(des_pos(0)) || std::isnan(des_pos(1)) || std::isnan(des_pos(2)));
   bool flag_use_vel = !(std::isnan(des_vel(0)) || std::isnan(des_vel(1)) || std::isnan(des_vel(2)));
@@ -47,8 +43,7 @@ void SO3Control::calculateControl(const Eigen::Vector3d &des_pos,
   if (flag_use_acc)
     totalError.noalias() += des_acc - acc_;
 
-  Eigen::Vector3d ka(fabs(totalError[0]) > 3 ? 0 : (fabs(totalError[0]) * 0.2),
-                     fabs(totalError[1]) > 3 ? 0 : (fabs(totalError[1]) * 0.2),
+  Eigen::Vector3d ka(fabs(totalError[0]) > 3 ? 0 : (fabs(totalError[0]) * 0.2), fabs(totalError[1]) > 3 ? 0 : (fabs(totalError[1]) * 0.2),
                      fabs(totalError[2]) > 3 ? 0 : (fabs(totalError[2]) * 0.2));
 
   force_ = mass_ * g_ * Eigen::Vector3d(0, 0, 1);
@@ -92,17 +87,17 @@ void SO3Control::calculateControl(const Eigen::Vector3d &des_pos,
   orientation_ = Eigen::Quaterniond(R);
 }
 
-const Eigen::Vector3d &SO3Control::getComputedForce()
+const Eigen::Vector3d& SO3Control::getComputedForce()
 {
   return force_;
 }
 
-const Eigen::Quaterniond &SO3Control::getComputedOrientation()
+const Eigen::Quaterniond& SO3Control::getComputedOrientation()
 {
   return orientation_;
 }
 
-void SO3Control::setAcc(const Eigen::Vector3d &acc)
+void SO3Control::setAcc(const Eigen::Vector3d& acc)
 {
   acc_ = acc;
 }

@@ -61,9 +61,9 @@ class VectorProperty;
  * \class MultiProbMapDisplay
  * \brief Displays a map along the XY plane.
  */
-class MultiProbMapDisplay: public Display
+class MultiProbMapDisplay : public Display
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   MultiProbMapDisplay();
   virtual ~MultiProbMapDisplay();
@@ -71,12 +71,11 @@ public:
   // Overrides from Display
   virtual void onInitialize();
   virtual void reset();
-  virtual void update( float wall_dt, float ros_dt );
+  virtual void update(float wall_dt, float ros_dt);
 
 protected Q_SLOTS:
   void updateTopic();
   void updateDrawUnder();
-
 
 protected:
   // overrides from Display
@@ -89,11 +88,11 @@ protected:
   void incomingMap(const multi_map_server::MultiOccupancyGrid::ConstPtr& msg);
 
   void clear();
-  
+
   std::vector<Ogre::ManualObject*> manual_object_;
   std::vector<Ogre::TexturePtr> texture_;
-  std::vector<Ogre::MaterialPtr> material_;  
-  
+  std::vector<Ogre::MaterialPtr> material_;
+
   bool loaded_;
 
   std::string topic_;
@@ -109,6 +108,6 @@ protected:
   bool new_map_;
 };
 
-} // namespace rviz
+}  // namespace rviz
 
- #endif
+#endif

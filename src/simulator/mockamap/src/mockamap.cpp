@@ -11,9 +11,9 @@
 
 #include "maps.hpp"
 
-void optimizeMap(mocka::Maps::BasicInfo &in)
+void optimizeMap(mocka::Maps::BasicInfo& in)
 {
-  std::vector<int> *temp = new std::vector<int>;
+  std::vector<int>* temp = new std::vector<int>;
 
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -30,24 +30,19 @@ void optimizeMap(mocka::Maps::BasicInfo &in)
   }
 
   kdtree.setInputCloud(cloud);
-  double radius = 1.75 / in.scale; // 1.75 is the rounded up value of sqrt(3)
+  double radius = 1.75 / in.scale;  // 1.75 is the rounded up value of sqrt(3)
 
   for (uint32_t i = 0; i < cloud->width; i++)
   {
     std::vector<int> pointIdxRadiusSearch;
     std::vector<float> pointRadiusSquaredDistance;
 
-    if (kdtree.radiusSearch(cloud->points[i], radius, pointIdxRadiusSearch,
-                            pointRadiusSquaredDistance) >= 27)
-    {
+    if (kdtree.radiusSearch(cloud->points[i], radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) >= 27)
       temp->push_back(i);
-    }
   }
+
   for (int i = temp->size() - 1; i >= 0; i--)
-  {
-    in.cloud->points.erase(in.cloud->points.begin() +
-                           temp->at(i)); // erasing the enclosed points
-  }
+    in.cloud->points.erase(in.cloud->points.begin() + temp->at(i));  // erasing the enclosed points
   in.cloud->width -= temp->size();
 
   pcl::toROSMsg(*in.cloud, *in.output);
@@ -57,7 +52,7 @@ void optimizeMap(mocka::Maps::BasicInfo &in)
   return;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "mockamap");
   ros::NodeHandle nh;
@@ -66,7 +61,6 @@ int main(int argc, char **argv)
   ros::Publisher pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("mock_map", 1);
   pcl::PointCloud<pcl::PointXYZ> cloud;
   sensor_msgs::PointCloud2 output;
-  // Fill in the cloud data
 
   int seed;
 

@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(so3_quadrotor_simulator)
 
 add_compile_options(-std=c++11)
-
+# set(CMAKE_BUILD_TYPE "Debug")
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -14,28 +14,22 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_utils
 )
 
-###########
-## Build ##
-###########
-
 find_package(Eigen3 REQUIRED)
-
-include_directories(${EIGEN3_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/ode)
-
 find_package(Armadillo REQUIRED)
-include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES irobot_msgs
+  # LIBRARIES irobot_msgs
   CATKIN_DEPENDS roscpp quadrotor_msgs uav_utils
-  DEPENDS Eigen3 system_lib
+  # DEPENDS system_lib
 )
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
+  ${ARMADILLO_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/ode
 )
 
 add_library(quadrotor_dynamics src/dynamics/Quadrotor.cpp)

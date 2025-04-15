@@ -30,4 +30,4 @@ private:
   double grad(int hash, double x, double y, double z);
 };
 
-#endif // PERLINNOISE_HPP
+#endif  // PERLINNOISE_HPP

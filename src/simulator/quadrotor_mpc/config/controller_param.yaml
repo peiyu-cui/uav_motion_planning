@@ -1,0 +1,53 @@
+predict_horizon: 16
+control_horizon: 2
+max_iteration: 16
+threads: 8
+
+# for most computer, discrete_time shold
+# larger than 0.05, or the command will
+# not be execute correctly
+discrete_time: 0.15
+solve_time: 0.08
+publish_time: 0.05
+dual_tolerance: 1.0
+primal_tolerance: 0.5
+
+state_weight: [10.0, 10.0, 10.0, 10.0,
+               100.0, 100.0, 100.0, 100.0,
+               10.0, 10.0, 10.0, 10.0]
+
+control_weight: [0.5, 0.5, 0.5, 0.1]
+
+scale_weight: 100.0
+admm_weight_t: 1300.0
+admm_weight_r: 1300.0
+
+state_lower_bounds: [-10.0,   -10.0,   -1.0,  -3.142,
+                     -20.0,   -20.0,  -20.0,  -10.0,
+                     -100.0,   -100.0,  -100.0,  -100.0]
+
+state_upper_bounds: [10.0,  80.0,   20.0,  3.142,
+                     20.0,  20.0,  20.0,  10.0,
+                     100.0,  100.0,  100.0,  100.0]
+
+# state_lower_bounds: [-100.0,   -100.0,   -100.0,  -100.0,
+#                      -100.0,   -100.0,  -100.0,  -100.0,
+#                      -100.0,   -100.0,  -100.0,  -100.0]
+
+# state_upper_bounds: [100.0,  100.0,  100.0,  100.0,
+#                      100.0,  100.0,  100.0,  100.0,
+#                      100.0,  100.0,  100.0,  100.0]
+
+
+control_lower_bounds: [-100.0, -100.0, -100.0, -100.0]
+control_upper_bounds: [100.0, 100.0, 100.0, 100.0]
+
+scale_lower_bounds: 1.10
+scale_upper_bounds: 2.00
+
+gravity: 9.806650161743164
+hover_throttle: 0.1174
+
+map_bounds: [-10.0, 10.0, -10.0, 70.0, -1.0, 5.0]
+host_ip: "localhost"
+frame_id: "world_enu"

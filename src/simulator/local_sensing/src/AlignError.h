@@ -3,8 +3,8 @@
 
 struct AlignError
 {
-  AlignError(const Eigen::Quaterniond camera_pose, const Eigen::Vector3d camera_trans,
-             const Eigen::Quaterniond velodyne_pose, const Eigen::Vector3d velodyne_trans)
+  AlignError(const Eigen::Quaterniond camera_pose, const Eigen::Vector3d camera_trans, const Eigen::Quaterniond velodyne_pose,
+             const Eigen::Vector3d velodyne_trans)
   {
     camera_q[0] = camera_pose.x();
     camera_q[1] = camera_pose.y();
@@ -24,17 +24,15 @@ struct AlignError
   }
 
   // Factory to hide the construction of the CostFunction object from the client code.
-  static ceres::CostFunction *Create(const Eigen::Quaterniond camera_pose, const Eigen::Vector3d camera_trans,
-                                     const Eigen::Quaterniond velodyne_pose, const Eigen::Vector3d velodyne_trans)
+  static ceres::CostFunction* Create(const Eigen::Quaterniond camera_pose, const Eigen::Vector3d camera_trans, const Eigen::Quaterniond velodyne_pose,
+                                     const Eigen::Vector3d velodyne_trans)
   {
-    return (new ceres::AutoDiffCostFunction<AlignError, 6, 4, 3, 4, 3>(
-        new AlignError(camera_pose, camera_trans, velodyne_pose, velodyne_trans)));
+    return (new ceres::AutoDiffCostFunction<AlignError, 6, 4, 3, 4, 3>(new AlignError(camera_pose, camera_trans, velodyne_pose, velodyne_trans)));
   }
 
   template <typename T>
-  bool operator()(const T *const world_rotation, const T *const world_translation,
-                  const T *const v2c_rotation, const T *const v2c_translation,
-                  T *residuals) const
+  bool operator()(const T* const world_rotation, const T* const world_translation, const T* const v2c_rotation, const T* const v2c_translation,
+                  T* residuals) const
   {
     Eigen::Quaternion<T> q_world = Eigen::Map<const Eigen::Quaternion<T>>(world_rotation);
     Eigen::Matrix<T, 3, 1> t_world = Eigen::Map<const Eigen::Matrix<T, 3, 1>>(world_translation);

@@ -2,7 +2,7 @@
 
 // Rotation ---------------------
 
-mat ypr_to_R(const colvec &ypr)
+mat ypr_to_R(const colvec& ypr)
 {
   double c, s;
   mat Rz = zeros<mat>(3, 3);
@@ -53,7 +53,7 @@ mat yaw_to_R(double yaw)
   return R;
 }
 
-colvec R_to_ypr(const mat &R)
+colvec R_to_ypr(const mat& R)
 {
   colvec n = R.col(0);
   colvec o = R.col(1);
@@ -70,7 +70,7 @@ colvec R_to_ypr(const mat &R)
   return ypr;
 }
 
-mat quaternion_to_R(const colvec &q)
+mat quaternion_to_R(const colvec& q)
 {
   double n = norm(q, 2);
   colvec nq = q / n;
@@ -104,7 +104,7 @@ mat quaternion_to_R(const colvec &q)
   return R;
 }
 
-colvec R_to_quaternion(const mat &R)
+colvec R_to_quaternion(const mat& R)
 {
   colvec q(4);
   double tr = R(0, 0) + R(1, 1) + R(2, 2);
@@ -144,7 +144,7 @@ colvec R_to_quaternion(const mat &R)
   return q;
 }
 
-colvec quaternion_mul(const colvec &q1, const colvec &q2)
+colvec quaternion_mul(const colvec& q1, const colvec& q2)
 {
   double a1 = q1(0);
   double b1 = q1(1);
@@ -165,7 +165,7 @@ colvec quaternion_mul(const colvec &q1, const colvec &q2)
   return q3;
 }
 
-colvec quaternion_inv(const colvec &q)
+colvec quaternion_inv(const colvec& q)
 {
   colvec q2(4);
   q2(0) = q(0);
@@ -178,7 +178,7 @@ colvec quaternion_inv(const colvec &q)
 
 // General Pose Update ----------
 
-colvec pose_update(const colvec &X1, const colvec &X2)
+colvec pose_update(const colvec& X1, const colvec& X2)
 {
   mat R1 = ypr_to_R(X1.rows(3, 5));
   mat R2 = ypr_to_R(X2.rows(3, 5));
@@ -192,7 +192,7 @@ colvec pose_update(const colvec &X1, const colvec &X2)
   return X3;
 }
 
-colvec pose_inverse(const colvec &X)
+colvec pose_inverse(const colvec& X)
 {
   mat R = ypr_to_R(X.rows(3, 5));
   colvec n = R.col(0);
@@ -213,7 +213,7 @@ colvec pose_inverse(const colvec &X)
   return XI;
 }
 
-colvec pose_update_2d(const colvec &X1, const colvec &X2)
+colvec pose_update_2d(const colvec& X1, const colvec& X2)
 {
   mat R = yaw_to_R(X1(2));
   colvec X3(3);
@@ -223,7 +223,7 @@ colvec pose_update_2d(const colvec &X1, const colvec &X2)
   return X3;
 }
 
-colvec pose_inverse_2d(const colvec &X)
+colvec pose_inverse_2d(const colvec& X)
 {
   double c = cos(X(2));
   double s = sin(X(2));
@@ -237,7 +237,7 @@ colvec pose_inverse_2d(const colvec &X)
 
 // For Pose EKF ----------------------
 
-mat Jplus1(const colvec &X1, const colvec &X2)
+mat Jplus1(const colvec& X1, const colvec& X2)
 {
   colvec X3 = pose_update(X1, X2);
   mat R1 = ypr_to_R(X1.rows(3, 5));
@@ -251,17 +251,29 @@ mat Jplus1(const colvec &X1, const colvec &X2)
   mat I = eye<mat>(3, 3);
   mat Z = zeros<mat>(3, 3);
 
-  double Marr[9] = {-(X3(2 - 1) - X1(2 - 1)), (X3(3 - 1) - X1(3 - 1)) * cos(X1(4 - 1)), a1(1 - 1) * X2(2 - 1) - o1(1 - 1) * X2(3 - 1),
-                    X3(1 - 1) - X1(1 - 1), (X3(3 - 1) - X1(3 - 1)) * sin(X1(4 - 1)), a1(2 - 1) * X2(2 - 1) - o1(2 - 1) * X2(3 - 1),
-                    0, -X2(1 - 1) * cos(X1(5 - 1)) - X2(2 - 1) * sin(X1(5 - 1)) * sin(X1(6 - 1)) - X2(3 - 1) * sin(X1(5 - 1)) * cos(X1(6 - 1)), a1(3 - 1) * X2(2 - 1) - o1(3 - 1) * X2(3 - 1)};
+  double Marr[9] = { -(X3(2 - 1) - X1(2 - 1)),
+                     (X3(3 - 1) - X1(3 - 1)) * cos(X1(4 - 1)),
+                     a1(1 - 1) * X2(2 - 1) - o1(1 - 1) * X2(3 - 1),
+                     X3(1 - 1) - X1(1 - 1),
+                     (X3(3 - 1) - X1(3 - 1)) * sin(X1(4 - 1)),
+                     a1(2 - 1) * X2(2 - 1) - o1(2 - 1) * X2(3 - 1),
+                     0,
+                     -X2(1 - 1) * cos(X1(5 - 1)) - X2(2 - 1) * sin(X1(5 - 1)) * sin(X1(6 - 1)) - X2(3 - 1) * sin(X1(5 - 1)) * cos(X1(6 - 1)),
+                     a1(3 - 1) * X2(2 - 1) - o1(3 - 1) * X2(3 - 1) };
   mat M(3, 3);
   for (int i = 0; i < 9; i++)
     M(i) = Marr[i];
   M = trans(M);
 
-  double K1arr[9] = {1, sin(X3(5 - 1)) * sin(X3(4 - 1) - X1(4 - 1)) / cos(X3(5 - 1)), (o2(1 - 1) * sin(X3(6 - 1)) + a2(1 - 1) * cos(X3(6 - 1))) / cos(X3(5 - 1)),
-                     0, cos(X3(4 - 1) - X1(4 - 1)), -cos(X1(5 - 1)) * sin(X3(4 - 1) - X1(4 - 1)),
-                     0, sin(X3(4 - 1) - X1(4 - 1)) / cos(X3(5 - 1)), cos(X1(5 - 1)) * cos(X3(4 - 1) - X1(4 - 1)) / cos(X3(5 - 1))};
+  double K1arr[9] = { 1,
+                      sin(X3(5 - 1)) * sin(X3(4 - 1) - X1(4 - 1)) / cos(X3(5 - 1)),
+                      (o2(1 - 1) * sin(X3(6 - 1)) + a2(1 - 1) * cos(X3(6 - 1))) / cos(X3(5 - 1)),
+                      0,
+                      cos(X3(4 - 1) - X1(4 - 1)),
+                      -cos(X1(5 - 1)) * sin(X3(4 - 1) - X1(4 - 1)),
+                      0,
+                      sin(X3(4 - 1) - X1(4 - 1)) / cos(X3(5 - 1)),
+                      cos(X1(5 - 1)) * cos(X3(4 - 1) - X1(4 - 1)) / cos(X3(5 - 1)) };
   mat K1(3, 3);
   for (int i = 0; i < 9; i++)
     K1(i) = K1arr[i];
@@ -272,7 +284,7 @@ mat Jplus1(const colvec &X1, const colvec &X2)
   return J1;
 }
 
-mat Jplus2(const colvec &X1, const colvec &X2)
+mat Jplus2(const colvec& X1, const colvec& X2)
 {
   colvec X3 = pose_update(X1, X2);
   mat R1 = ypr_to_R(X1.rows(3, 5));
@@ -285,9 +297,15 @@ mat Jplus2(const colvec &X1, const colvec &X2)
 
   mat Z = zeros<mat>(3, 3);
 
-  double K2arr[9] = {cos(X2(5 - 1)) * cos(X3(6 - 1) - X2(6 - 1)) / cos(X3(5 - 1)), sin(X3(6 - 1) - X2(6 - 1)) / cos(X3(5 - 1)), 0,
-                     -cos(X2(5 - 1)) * sin(X3(6 - 1) - X2(6 - 1)), cos(X3(6 - 1) - X2(6 - 1)), 0,
-                     (a1(1 - 1) * cos(X3(4 - 1)) + a1(2 - 1) * sin(X3(4 - 1))) / cos(X3(5 - 1)), sin(X3(5 - 1)) * sin(X3(6 - 1) - X2(6 - 1)) / cos(X3(5 - 1)), 1};
+  double K2arr[9] = { cos(X2(5 - 1)) * cos(X3(6 - 1) - X2(6 - 1)) / cos(X3(5 - 1)),
+                      sin(X3(6 - 1) - X2(6 - 1)) / cos(X3(5 - 1)),
+                      0,
+                      -cos(X2(5 - 1)) * sin(X3(6 - 1) - X2(6 - 1)),
+                      cos(X3(6 - 1) - X2(6 - 1)),
+                      0,
+                      (a1(1 - 1) * cos(X3(4 - 1)) + a1(2 - 1) * sin(X3(4 - 1))) / cos(X3(5 - 1)),
+                      sin(X3(5 - 1)) * sin(X3(6 - 1) - X2(6 - 1)) / cos(X3(5 - 1)),
+                      1 };
   mat K2(3, 3);
   for (int i = 0; i < 9; i++)
     K2(i) = K2arr[i];
@@ -300,7 +318,7 @@ mat Jplus2(const colvec &X1, const colvec &X2)
 
 // For IMU EKF ----------------------
 
-colvec state_update(const colvec &X, const colvec &U, double dt)
+colvec state_update(const colvec& X, const colvec& U, double dt)
 {
   double ro = X(3);
   double pt = X(4);
@@ -331,7 +349,7 @@ colvec state_update(const colvec &X, const colvec &U, double dt)
   return Xt;
 }
 
-mat jacobianF(const colvec &X, const colvec &U, double dt)
+mat jacobianF(const colvec& X, const colvec& U, double dt)
 {
   double x = X(0);
   double y = X(1);
@@ -356,7 +374,10 @@ mat jacobianF(const colvec &X, const colvec &U, double dt)
   F(0, 2) = 0;
   F(0, 3) = (dt * dt * (ay * (sin(ro) * sin(ya) + cos(ro) * cos(ya) * sin(pt)) + az * (cos(ro) * sin(ya) - cos(ya) * sin(pt) * sin(ro)))) / 2;
   F(0, 4) = (dt * dt * (az * cos(pt) * cos(ro) * cos(ya) - ax * cos(ya) * sin(pt) + ay * cos(pt) * cos(ya) * sin(ro))) / 2;
-  F(0, 5) = -(dt * dt * (ay * (cos(ro) * cos(ya) + sin(pt) * sin(ro) * sin(ya)) - az * (cos(ya) * sin(ro) - cos(ro) * sin(pt) * sin(ya)) + ax * cos(pt) * sin(ya))) / 2;
+  F(0, 5) =
+      -(dt * dt *
+        (ay * (cos(ro) * cos(ya) + sin(pt) * sin(ro) * sin(ya)) - az * (cos(ya) * sin(ro) - cos(ro) * sin(pt) * sin(ya)) + ax * cos(pt) * sin(ya))) /
+      2;
   F(0, 6) = dt;
   F(0, 7) = 0;
   F(0, 8) = 0;
@@ -366,7 +387,10 @@ mat jacobianF(const colvec &X, const colvec &U, double dt)
   F(1, 2) = 0;
   F(1, 3) = -(dt * dt * (ay * (cos(ya) * sin(ro) - cos(ro) * sin(pt) * sin(ya)) + az * (cos(ro) * cos(ya) + sin(pt) * sin(ro) * sin(ya)))) / 2;
   F(1, 4) = (dt * dt * (az * cos(pt) * cos(ro) * sin(ya) - ax * sin(pt) * sin(ya) + ay * cos(pt) * sin(ro) * sin(ya))) / 2;
-  F(1, 5) = (dt * dt * (az * (sin(ro) * sin(ya) + cos(ro) * cos(ya) * sin(pt)) - ay * (cos(ro) * sin(ya) - cos(ya) * sin(pt) * sin(ro)) + ax * cos(pt) * cos(ya))) / 2;
+  F(1, 5) =
+      (dt * dt *
+       (az * (sin(ro) * sin(ya) + cos(ro) * cos(ya) * sin(pt)) - ay * (cos(ro) * sin(ya) - cos(ya) * sin(pt) * sin(ro)) + ax * cos(pt) * cos(ya))) /
+      2;
   F(1, 6) = 0;
   F(1, 7) = dt;
   F(1, 8) = 0;
@@ -385,7 +409,9 @@ mat jacobianF(const colvec &X, const colvec &U, double dt)
   F(3, 1) = 0;
   F(3, 2) = 0;
   F(3, 3) = 1 - dt * ((wz * (cos(pt - ro) / 2 - cos(pt + ro) / 2)) / cos(pt) - (wy * (sin(pt - ro) / 2 + sin(pt + ro) / 2)) / cos(pt));
-  F(3, 4) = dt * ((wz * (cos(pt - ro) / 2 + cos(pt + ro) / 2)) / cos(pt) - (wy * (sin(pt - ro) / 2 - sin(pt + ro) / 2)) / cos(pt) + (wy * sin(pt) * (cos(pt - ro) / 2 - cos(pt + ro) / 2)) / (cos(pt) * cos(pt)) + (wz * sin(pt) * (sin(pt - ro) / 2 + sin(pt + ro) / 2)) / (cos(pt) * cos(pt)));
+  F(3, 4) = dt * ((wz * (cos(pt - ro) / 2 + cos(pt + ro) / 2)) / cos(pt) - (wy * (sin(pt - ro) / 2 - sin(pt + ro) / 2)) / cos(pt) +
+                  (wy * sin(pt) * (cos(pt - ro) / 2 - cos(pt + ro) / 2)) / (cos(pt) * cos(pt)) +
+                  (wz * sin(pt) * (sin(pt - ro) / 2 + sin(pt + ro) / 2)) / (cos(pt) * cos(pt)));
   F(3, 5) = 0;
   F(3, 6) = 0;
   F(3, 7) = 0;
@@ -416,7 +442,8 @@ mat jacobianF(const colvec &X, const colvec &U, double dt)
   F(6, 2) = 0;
   F(6, 3) = dt * (ay * (sin(ro) * sin(ya) + cos(ro) * cos(ya) * sin(pt)) + az * (cos(ro) * sin(ya) - cos(ya) * sin(pt) * sin(ro)));
   F(6, 4) = dt * (az * cos(pt) * cos(ro) * cos(ya) - ax * cos(ya) * sin(pt) + ay * cos(pt) * cos(ya) * sin(ro));
-  F(6, 5) = -dt * (ay * (cos(ro) * cos(ya) + sin(pt) * sin(ro) * sin(ya)) - az * (cos(ya) * sin(ro) - cos(ro) * sin(pt) * sin(ya)) + ax * cos(pt) * sin(ya));
+  F(6, 5) = -dt * (ay * (cos(ro) * cos(ya) + sin(pt) * sin(ro) * sin(ya)) - az * (cos(ya) * sin(ro) - cos(ro) * sin(pt) * sin(ya)) +
+                   ax * cos(pt) * sin(ya));
   F(6, 6) = 1;
   F(6, 7) = 0;
   F(6, 8) = 0;
@@ -426,7 +453,8 @@ mat jacobianF(const colvec &X, const colvec &U, double dt)
   F(7, 2) = 0;
   F(7, 3) = -dt * (ay * (cos(ya) * sin(ro) - cos(ro) * sin(pt) * sin(ya)) + az * (cos(ro) * cos(ya) + sin(pt) * sin(ro) * sin(ya)));
   F(7, 4) = dt * (az * cos(pt) * cos(ro) * sin(ya) - ax * sin(pt) * sin(ya) + ay * cos(pt) * sin(ro) * sin(ya));
-  F(7, 5) = dt * (az * (sin(ro) * sin(ya) + cos(ro) * cos(ya) * sin(pt)) - ay * (cos(ro) * sin(ya) - cos(ya) * sin(pt) * sin(ro)) + ax * cos(pt) * cos(ya));
+  F(7, 5) =
+      dt * (az * (sin(ro) * sin(ya) + cos(ro) * cos(ya) * sin(pt)) - ay * (cos(ro) * sin(ya) - cos(ya) * sin(pt) * sin(ro)) + ax * cos(pt) * cos(ya));
   F(7, 6) = 0;
   F(7, 7) = 1;
   F(7, 8) = 0;
@@ -444,7 +472,7 @@ mat jacobianF(const colvec &X, const colvec &U, double dt)
   return F;
 }
 
-mat jacobianU(const colvec &X, const colvec &U, double dt)
+mat jacobianU(const colvec& X, const colvec& U, double dt)
 {
   double x = X(0);
   double y = X(1);
@@ -530,7 +558,7 @@ mat jacobianU(const colvec &X, const colvec &U, double dt)
   return G;
 }
 
-colvec state_measure(const colvec &X)
+colvec state_measure(const colvec& X)
 {
   colvec Z = X.rows(0, 5);
 

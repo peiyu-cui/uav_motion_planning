@@ -31,7 +31,7 @@ typedef struct _Disturbance
 static Command command;
 static Disturbance disturbance;
 
-void stateToOdomMsg(const QuadrotorSimulator::Quadrotor::State &state, nav_msgs::Odometry &odom)
+void stateToOdomMsg(const QuadrotorSimulator::Quadrotor::State& state, nav_msgs::Odometry& odom)
 {
   odom.pose.pose.position.x = state.x(0);
   odom.pose.pose.position.y = state.x(1);
@@ -52,7 +52,7 @@ void stateToOdomMsg(const QuadrotorSimulator::Quadrotor::State &state, nav_msgs:
   odom.twist.twist.angular.z = state.omega(2);
 }
 
-void quadToImuMsg(const QuadrotorSimulator::Quadrotor &quad, sensor_msgs::Imu &imu)
+void quadToImuMsg(const QuadrotorSimulator::Quadrotor& quad, sensor_msgs::Imu& imu)
 {
   QuadrotorSimulator::Quadrotor::State state = quad.getState();
   Eigen::Quaterniond q(state.R);
@@ -70,7 +70,7 @@ void quadToImuMsg(const QuadrotorSimulator::Quadrotor &quad, sensor_msgs::Imu &i
   imu.linear_acceleration.z = quad.getAcc()[2];
 }
 
-static Control getControl(const QuadrotorSimulator::Quadrotor &quad, const Command &cmd)
+static Control getControl(const QuadrotorSimulator::Quadrotor& quad, const Command& cmd)
 {
   const double _kf = quad.getPropellerThrustCoefficient();
   const double _km = quad.getPropellerMomentCoefficient();
@@ -79,9 +79,7 @@ static Control getControl(const QuadrotorSimulator::Quadrotor &quad, const Comma
 
   const double d = quad.getArmLength();
   const Eigen::Matrix3f J = quad.getInertia().cast<float>();
-  const float I[3][3] = {{J(0, 0), J(0, 1), J(0, 2)},
-                         {J(1, 0), J(1, 1), J(1, 2)},
-                         {J(2, 0), J(2, 1), J(2, 2)}};
+  const float I[3][3] = { { J(0, 0), J(0, 1), J(0, 2) }, { J(1, 0), J(1, 1), J(1, 2) }, { J(2, 0), J(2, 1), J(2, 2) } };
   const QuadrotorSimulator::Quadrotor::State state = quad.getState();
 
   // Rotation, may use external yaw
@@ -90,8 +88,7 @@ static Control getControl(const QuadrotorSimulator::Quadrotor &quad, const Comma
   if (cmd.use_external_yaw)
     ypr[0] = cmd.current_yaw;
   Eigen::Matrix3d R;
-  R = Eigen::AngleAxisd(ypr[0], Eigen::Vector3d::UnitZ()) *
-      Eigen::AngleAxisd(ypr[1], Eigen::Vector3d::UnitY()) *
+  R = Eigen::AngleAxisd(ypr[0], Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(ypr[1], Eigen::Vector3d::UnitY()) *
       Eigen::AngleAxisd(ypr[2], Eigen::Vector3d::UnitX());
   float R11 = R(0, 0);
   float R12 = R(0, 1);
@@ -130,7 +127,7 @@ static Control getControl(const QuadrotorSimulator::Quadrotor &quad, const Comma
   float Psi = 0.5f * (3.0f - (Rd11 * R11 + Rd21 * R21 + Rd31 * R31 + Rd12 * R12 + Rd22 * R22 + Rd32 * R32 + Rd13 * R13 + Rd23 * R23 + Rd33 * R33));
 
   float force = 0;
-  if (Psi < 1.0f) // Position control stability guaranteed only when Psi < 1
+  if (Psi < 1.0f)  // Position control stability guaranteed only when Psi < 1
     force = cmd.force[0] * R13 + cmd.force[1] * R23 + cmd.force[2] * R33;
 
   float eR1 = 0.5f * (R12 * Rd13 - R13 * Rd12 + R22 * Rd23 - R23 * Rd22 + R32 * Rd33 - R33 * Rd32);
@@ -158,9 +155,9 @@ static Control getControl(const QuadrotorSimulator::Quadrotor &quad, const Comma
     float muR3 = -deltaR*deltaR * eA3 / (deltaR * neA + epsilonR);
     // Robust Control --------------------------------------------
   */
-  float M1 = -cmd.kR[0] * eR1 - cmd.kOm[0] * eOm1 + in1; // - I[0][0]*muR1;
-  float M2 = -cmd.kR[1] * eR2 - cmd.kOm[1] * eOm2 + in2; // - I[1][1]*muR2;
-  float M3 = -cmd.kR[2] * eR3 - cmd.kOm[2] * eOm3 + in3; // - I[2][2]*muR3;
+  float M1 = -cmd.kR[0] * eR1 - cmd.kOm[0] * eOm1 + in1;  // - I[0][0]*muR1;
+  float M2 = -cmd.kR[1] * eR2 - cmd.kOm[1] * eOm2 + in2;  // - I[1][1]*muR2;
+  float M3 = -cmd.kR[2] * eR3 - cmd.kOm[2] * eOm3 + in3;  // - I[2][2]*muR3;
 
   float w_sq[4];
   w_sq[0] = force / (4 * kf) - M2 / (2 * d * kf) + M3 / (4 * km);
@@ -179,7 +176,7 @@ static Control getControl(const QuadrotorSimulator::Quadrotor &quad, const Comma
   return control;
 }
 
-static void cmd_callback(const quadrotor_msgs::SO3Command::ConstPtr &cmd)
+static void cmd_callback(const quadrotor_msgs::SO3Command::ConstPtr& cmd)
 {
   command.force[0] = cmd->force.x;
   command.force[1] = cmd->force.y;
@@ -201,21 +198,21 @@ static void cmd_callback(const quadrotor_msgs::SO3Command::ConstPtr &cmd)
   command.use_external_yaw = cmd->aux.use_external_yaw;
 }
 
-static void force_disturbance_callback(const geometry_msgs::Vector3::ConstPtr &f)
+static void force_disturbance_callback(const geometry_msgs::Vector3::ConstPtr& f)
 {
   disturbance.f(0) = f->x;
   disturbance.f(1) = f->y;
   disturbance.f(2) = f->z;
 }
 
-static void moment_disturbance_callback(const geometry_msgs::Vector3::ConstPtr &m)
+static void moment_disturbance_callback(const geometry_msgs::Vector3::ConstPtr& m)
 {
   disturbance.m(0) = m->x;
   disturbance.m(1) = m->y;
   disturbance.m(2) = m->z;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "quadrotor_simulator_so3");
   ros::NodeHandle nh("~");
@@ -254,7 +251,7 @@ int main(int argc, char **argv)
   Control control;
 
   nav_msgs::Odometry odom_msg;
-  odom_msg.header.frame_id = "/world";
+  odom_msg.header.frame_id = "world";
   odom_msg.child_frame_id = "/" + quad_name;
 
   sensor_msgs::Imu imu;

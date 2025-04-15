@@ -13,7 +13,14 @@
 class SO3ControlNodelet : public nodelet::Nodelet
 {
 public:
-  SO3ControlNodelet() : position_cmd_updated_(false), position_cmd_init_(false), des_yaw_(0), des_yaw_dot_(0), current_yaw_(0), enable_motors_(true), use_external_yaw_(false)
+  SO3ControlNodelet()
+    : position_cmd_updated_(false)
+    , position_cmd_init_(false)
+    , des_yaw_(0)
+    , des_yaw_dot_(0)
+    , current_yaw_(0)
+    , enable_motors_(true)
+    , use_external_yaw_(false)
   {
   }
 
@@ -23,11 +30,11 @@ public:
 
 private:
   void publishSO3Command();
-  void position_cmd_callback(const quadrotor_msgs::PositionCommand::ConstPtr &cmd);
-  void odom_callback(const nav_msgs::Odometry::ConstPtr &odom);
-  void enable_motors_callback(const std_msgs::Bool::ConstPtr &msg);
-  void corrections_callback(const quadrotor_msgs::Corrections::ConstPtr &msg);
-  void imu_callback(const sensor_msgs::Imu &imu);
+  void position_cmd_callback(const quadrotor_msgs::PositionCommand::ConstPtr& cmd);
+  void odom_callback(const nav_msgs::Odometry::ConstPtr& odom);
+  void enable_motors_callback(const std_msgs::Bool::ConstPtr& msg);
+  void corrections_callback(const quadrotor_msgs::Corrections::ConstPtr& msg);
+  void imu_callback(const sensor_msgs::Imu& imu);
 
   SO3Control controller_;
   ros::Publisher so3_command_pub_;
@@ -53,10 +60,10 @@ void SO3ControlNodelet::publishSO3Command()
 {
   controller_.calculateControl(des_pos_, des_vel_, des_acc_, des_yaw_, des_yaw_dot_, kx_, kv_);
 
-  const Eigen::Vector3d &force = controller_.getComputedForce();
-  const Eigen::Quaterniond &orientation = controller_.getComputedOrientation();
+  const Eigen::Vector3d& force = controller_.getComputedForce();
+  const Eigen::Quaterniond& orientation = controller_.getComputedOrientation();
 
-  quadrotor_msgs::SO3Command::Ptr so3_command(new quadrotor_msgs::SO3Command); //! @note memory leak?
+  quadrotor_msgs::SO3Command::Ptr so3_command(new quadrotor_msgs::SO3Command);  //! @note memory leak?
   so3_command->header.stamp = ros::Time::now();
   so3_command->header.frame_id = frame_id_;
   so3_command->force.x = force(0);
@@ -80,7 +87,7 @@ void SO3ControlNodelet::publishSO3Command()
   so3_command_pub_.publish(so3_command);
 }
 
-void SO3ControlNodelet::position_cmd_callback(const quadrotor_msgs::PositionCommand::ConstPtr &cmd)
+void SO3ControlNodelet::position_cmd_callback(const quadrotor_msgs::PositionCommand::ConstPtr& cmd)
 {
   des_pos_ = Eigen::Vector3d(cmd->position.x, cmd->position.y, cmd->position.z);
   des_vel_ = Eigen::Vector3d(cmd->velocity.x, cmd->velocity.y, cmd->velocity.z);
@@ -103,7 +110,7 @@ void SO3ControlNodelet::position_cmd_callback(const quadrotor_msgs::PositionComm
   publishSO3Command();
 }
 
-void SO3ControlNodelet::odom_callback(const nav_msgs::Odometry::ConstPtr &odom)
+void SO3ControlNodelet::odom_callback(const nav_msgs::Odometry::ConstPtr& odom)
 {
   const Eigen::Vector3d position(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z);
   const Eigen::Vector3d velocity(odom->twist.twist.linear.x, odom->twist.twist.linear.y, odom->twist.twist.linear.z);
@@ -134,7 +141,7 @@ void SO3ControlNodelet::odom_callback(const nav_msgs::Odometry::ConstPtr &odom)
   }
 }
 
-void SO3ControlNodelet::enable_motors_callback(const std_msgs::Bool::ConstPtr &msg)
+void SO3ControlNodelet::enable_motors_callback(const std_msgs::Bool::ConstPtr& msg)
 {
   if (msg->data)
     ROS_INFO("Enabling motors");
@@ -144,14 +151,14 @@ void SO3ControlNodelet::enable_motors_callback(const std_msgs::Bool::ConstPtr &m
   enable_motors_ = msg->data;
 }
 
-void SO3ControlNodelet::corrections_callback(const quadrotor_msgs::Corrections::ConstPtr &msg)
+void SO3ControlNodelet::corrections_callback(const quadrotor_msgs::Corrections::ConstPtr& msg)
 {
   corrections_[0] = msg->kf_correction;
   corrections_[1] = msg->angle_corrections[0];
   corrections_[2] = msg->angle_corrections[1];
 }
 
-void SO3ControlNodelet::imu_callback(const sensor_msgs::Imu &imu)
+void SO3ControlNodelet::imu_callback(const sensor_msgs::Imu& imu)
 {
   const Eigen::Vector3d acc(imu.linear_acceleration.x, imu.linear_acceleration.y, imu.linear_acceleration.z);
   controller_.setAcc(acc);

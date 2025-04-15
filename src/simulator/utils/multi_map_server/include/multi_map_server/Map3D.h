@@ -58,7 +58,7 @@ public:
   {
   }
 
-  void PackMsg(multi_map_server::VerticalOccupancyGridList &msg)
+  void PackMsg(multi_map_server::VerticalOccupancyGridList& msg)
   {
     msg.x = x;
     msg.y = y;
@@ -70,7 +70,7 @@ public:
     }
   }
 
-  void UnpackMsg(const multi_map_server::VerticalOccupancyGridList &msg)
+  void UnpackMsg(const multi_map_server::VerticalOccupancyGridList& msg)
   {
     x = msg.x;
     y = msg.y;
@@ -86,7 +86,7 @@ public:
     }
   }
 
-  void GetOccupancyGrids(vector<OccupancyGrid> &_grids)
+  void GetOccupancyGrids(vector<OccupancyGrid>& _grids)
   {
     _grids.clear();
     for (list<OccupancyGrid>::iterator k = grids.begin(); k != grids.end(); k++)
@@ -136,38 +136,38 @@ public:
     list<OccupancyGrid>::iterator gend = grids.end();
     gend--;
 
-    if (grids.size() == 0) // Empty case
+    if (grids.size() == 0)  // Empty case
     {
       grids.push_back(grid);
       return;
     }
-    else if (mz - grids.begin()->upper > 1) // Beyond highest
+    else if (mz - grids.begin()->upper > 1)  // Beyond highest
     {
       grids.push_front(grid);
       return;
     }
-    else if (mz - grids.begin()->upper == 1) // Next to highest
+    else if (mz - grids.begin()->upper == 1)  // Next to highest
     {
       grids.begin()->upper += 1;
       grids.begin()->mass += value;
       return;
     }
-    else if (gend->lower - mz > 1) // Below lowest
+    else if (gend->lower - mz > 1)  // Below lowest
     {
       grids.push_back(grid);
       return;
     }
-    else if (gend->lower - mz == 1) // Next to lowest
+    else if (gend->lower - mz == 1)  // Next to lowest
     {
       grids.end()->lower -= 1;
       grids.end()->mass += value;
       return;
     }
-    else // General case
+    else  // General case
     {
       for (list<OccupancyGrid>::iterator k = grids.begin(); k != grids.end(); k++)
       {
-        if (mz <= k->upper && mz >= k->lower) // Within a grid
+        if (mz <= k->upper && mz >= k->lower)  // Within a grid
         {
           k->mass += value;
           return;
@@ -176,26 +176,26 @@ public:
         {
           list<OccupancyGrid>::iterator j = k;
           j++;
-          if (k->lower - mz == 1 && mz - j->upper > 1) // ###*--###
+          if (k->lower - mz == 1 && mz - j->upper > 1)  // ###*--###
           {
             k->lower -= 1;
             k->mass += value;
             return;
           }
-          else if (k->lower - mz > 1 && mz - j->upper == 1) // ###--*###
+          else if (k->lower - mz > 1 && mz - j->upper == 1)  // ###--*###
           {
             j->upper += 1;
             j->mass += value;
             return;
           }
-          else if (k->lower - mz == 1 && mz - j->upper == 1) // ###*###
+          else if (k->lower - mz == 1 && mz - j->upper == 1)  // ###*###
           {
             k->lower = j->lower;
             k->mass += j->mass + value;
             grids.erase(j);
             return;
           }
-          else if (k->lower - mz > 1 && mz - j->upper > 1) // ###-*-###
+          else if (k->lower - mz > 1 && mz - j->upper > 1)  // ###-*-###
           {
             grids.insert(j, grid);
             return;
@@ -206,7 +206,7 @@ public:
   }
 
   // Merging two columns, merge the grids in input "gridList" into current column
-  inline void Merge(const OccupancyGridList &gridsIn)
+  inline void Merge(const OccupancyGridList& gridsIn)
   {
     // Create a sorted list containing both upper and lower values
     list<pair<int, int>> lp;
@@ -321,7 +321,7 @@ public:
     logOddFreeFixedThr = log(1.0 / (1.0 - PROB_FREE_FIXED_THRESHOLD) - 1.0) * LOG_ODD_SCALE_FACTOR;
   }
 
-  Map3D(const Map3D &_map3d)
+  Map3D(const Map3D& _map3d)
   {
     resolution = _map3d.resolution;
     decayInterval = _map3d.decayInterval;
@@ -363,7 +363,7 @@ public:
     }
   }
 
-  void PackMsg(multi_map_server::SparseMap3D &msg)
+  void PackMsg(multi_map_server::SparseMap3D& msg)
   {
     // Basic map info
     msg.header.stamp = ros::Time::now();
@@ -388,7 +388,7 @@ public:
     updateCounter++;
   }
 
-  void UnpackMsg(const multi_map_server::SparseMap3D &msg)
+  void UnpackMsg(const multi_map_server::SparseMap3D& msg)
   {
     // Unpack column msgs, Replace the whole column
     for (unsigned int k = 0; k < msg.lists.size(); k++)
@@ -460,7 +460,7 @@ public:
       mapBase[my * mapX + mx]->DeleteOccupancyGrid(mz);
   }
 
-  vector<arma::colvec> &GetOccupancyWorldFrame(int type = OCCUPIED)
+  vector<arma::colvec>& GetOccupancyWorldFrame(int type = OCCUPIED)
   {
     pts.clear();
     for (int mx = 0; mx < mapX; mx++)
@@ -507,22 +507,40 @@ public:
       decayInterval = _decayInterval;
   }
 
-  inline double GetResolution() { return resolution; }
-  inline double GetMaxX() { return originX + mapX * resolution; }
-  inline double GetMinX() { return originX; }
-  inline double GetMaxY() { return originY + mapY * resolution; }
-  inline double GetMinY() { return originY; }
-  inline bool Updated() { return updated; }
+  inline double GetResolution()
+  {
+    return resolution;
+  }
+  inline double GetMaxX()
+  {
+    return originX + mapX * resolution;
+  }
+  inline double GetMinX()
+  {
+    return originX;
+  }
+  inline double GetMaxY()
+  {
+    return originY + mapY * resolution;
+  }
+  inline double GetMinY()
+  {
+    return originY;
+  }
+  inline bool Updated()
+  {
+    return updated;
+  }
 
 private:
-  inline void WorldFrameToMapFrame(double x, double y, double z, int &mx, int &my, int &mz)
+  inline void WorldFrameToMapFrame(double x, double y, double z, int& mx, int& my, int& mz)
   {
     mx = (x - originX) / resolution;
     my = (y - originY) / resolution;
     mz = (z - originZ) / resolution;
   }
 
-  inline void MapFrameToWorldFrame(int mx, int my, int mz, double &x, double &y, double &z)
+  inline void MapFrameToWorldFrame(int mx, int my, int mz, double& x, double& y, double& z)
   {
     double r = 0.5 * resolution;
     x = mx * resolution + r + originX;
@@ -530,7 +548,7 @@ private:
     z = mz * resolution + r + originZ;
   }
 
-  inline void ResizeMapBase(int &mx, int &my)
+  inline void ResizeMapBase(int& mx, int& my)
   {
     if (mx < 0 || my < 0 || mx >= mapX || my >= mapY)
     {
@@ -558,7 +576,7 @@ private:
       {
         mapY += expandStep;
       }
-      vector<OccupancyGridList *> _mapBase = mapBase;
+      vector<OccupancyGridList*> _mapBase = mapBase;
       mapBase.clear();
       mapBase.resize(mapX * mapY, NULL);
       for (int _x = 0; _x < prevMapX; _x++)
@@ -604,12 +622,12 @@ private:
 
   bool updated;
   int updateCounter;
-  vector<OccupancyGridList *> updateList;
+  vector<OccupancyGridList*> updateList;
 
   double originX, originY, originZ;
   int mapX, mapY;
   int expandStep;
-  vector<OccupancyGridList *> mapBase;
+  vector<OccupancyGridList*> mapBase;
 
   vector<arma::colvec> pts;
 };

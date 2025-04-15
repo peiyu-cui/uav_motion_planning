@@ -38,7 +38,9 @@ public:
     updated = false;
   }
 
-  ~Map2D() {}
+  ~Map2D()
+  {
+  }
 
   double GetResolution()
   {
@@ -254,7 +256,7 @@ public:
     updated = true;
   }
 
-  const nav_msgs::OccupancyGrid &GetMap()
+  const nav_msgs::OccupancyGrid& GetMap()
   {
     map.header.stamp = ros::Time::now();
     map.info.map_load_time = ros::Time::now();

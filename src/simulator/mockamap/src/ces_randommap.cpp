@@ -72,7 +72,7 @@ pcl::PointCloud<pcl::PointXYZ> global_cloud_;
 ros::Time begin_time = ros::TIME_MAX;
 
 typedef Eigen::Vector3d ObsPos;
-typedef Eigen::Vector3d ObsSize; // x, y, height --- z
+typedef Eigen::Vector3d ObsSize;  // x, y, height --- z
 typedef pair<ObsPos, ObsPos> Obstacle;
 std::vector<Obstacle> obstacle_list;
 
@@ -150,15 +150,15 @@ void rcvOdometryCallbck(const nav_msgs::Odometry odom)
   odom_ = odom;
   has_odom_ = true;
 
-  state_ = {odom_.pose.pose.position.x,
-            odom_.pose.pose.position.y,
-            odom_.pose.pose.position.z,
-            odom_.twist.twist.linear.x,
-            odom_.twist.twist.linear.y,
-            odom_.twist.twist.linear.z,
-            0.0,
-            0.0,
-            0.0};
+  state_ = { odom_.pose.pose.position.x,
+             odom_.pose.pose.position.y,
+             odom_.pose.pose.position.z,
+             odom_.twist.twist.linear.x,
+             odom_.twist.twist.linear.y,
+             odom_.twist.twist.linear.z,
+             0.0,
+             0.0,
+             0.0 };
 
   _odom_queue.push_back(odom);
   while (_odom_queue.size() > _odom_queue_size)
@@ -201,9 +201,7 @@ void pubSensedPoints()
 
   pcl::PointXYZ ptInNoflation;
 
-  if (kdtreeLocalMap.radiusSearch(searchPoint, sensing_range_,
-                                  pointIdxRadiusSearch,
-                                  pointRadiusSquaredDistance) > 0)
+  if (kdtreeLocalMap.radiusSearch(searchPoint, sensing_range_, pointIdxRadiusSearch, pointRadiusSquaredDistance) > 0)
   {
     for (size_t i = 0; i < pointIdxRadiusSearch.size(); ++i)
     {

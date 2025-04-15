@@ -36,11 +36,13 @@
 #target_link_libraries(multi_map_visualization pose_utils)
 
 #----------------------------------
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(multi_map_server)
 
+add_compile_options(-std=c++14)
+# set(CMAKE_BUILD_TYPE "Debug")
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 ## Find catkin macros and libraries
@@ -59,6 +61,8 @@ find_package(catkin REQUIRED COMPONENTS
   pose_utils
   quadrotor_msgs
 )
+
+find_package(Armadillo REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -134,24 +138,22 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES irobot_msgs
+  #  INCLUDE_DIRS include
+  #  LIBRARIES irobot_msgs
   CATKIN_DEPENDS geometry_msgs nav_msgs quadrotor_msgs
-#  DEPENDS system_lib
+  #  DEPENDS system_lib
 )
 
 ###########
 ## Build ##
 ###########
-find_package(Armadillo REQUIRED)
-include_directories(${ARMADILLO_INCLUDE_DIRS})
-
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${ARMADILLO_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -164,13 +166,12 @@ add_executable(multi_map_visualization src/multi_map_visualization.cc)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(multi_map_visualization multi_map_server_messages_cpp)
+# add_dependencies(multi_map_visualization multi_map_server_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(multi_map_visualization 
+target_link_libraries(multi_map_visualization
   ${catkin_LIBRARIES}
   ${ARMADILLO_LIBRARIES}
-  ${pose_utils_LIBRARIES}
 )
 
 #############

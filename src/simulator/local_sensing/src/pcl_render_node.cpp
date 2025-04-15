@@ -40,7 +40,7 @@ using namespace cv;
 using namespace std;
 using namespace Eigen;
 
-int *depth_hostptr;
+int* depth_hostptr;
 cv::Mat depth_mat;
 
 // camera param
@@ -82,7 +82,7 @@ Eigen::Vector3d last_pose_world;
 void render_currentpose();
 void render_pcl_world();
 
-inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i &index)
+inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i& index)
 {
   Eigen::Vector3d pt;
   pt(0) = ((double)index(0) + 0.5) * resolution_ + x_l_;
@@ -92,7 +92,7 @@ inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i &index)
   return pt;
 };
 
-inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d &pt)
+inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d& pt)
 {
   Eigen::Vector3i idx;
   idx(0) = std::min(std::max(int((pt(0) - x_l_) * inv_resolution_), 0), GLX_SIZE_ - 1);
@@ -102,7 +102,7 @@ inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d &pt)
   return idx;
 };
 
-void rcvOdometryCallbck(const nav_msgs::Odometry &odom)
+void rcvOdometryCallbck(const nav_msgs::Odometry& odom)
 {
   /*if(!has_global_map)
     return;*/
@@ -140,10 +140,11 @@ void rcvOdometryCallbck(const nav_msgs::Odometry &odom)
   tf::Transform transform;
   transform.setOrigin( tf::Vector3(cam2world(0,3), cam2world(1,3), cam2world(2,3) ));
   transform.setRotation(tf::Quaternion(cam2world_quat.x(), cam2world_quat.y(), cam2world_quat.z(), cam2world_quat.w()));
-  br.sendTransform(tf::StampedTransform(transform, last_odom_stamp, "world", "camera")); //publish transform from world frame to quadrotor frame.*/
+  br.sendTransform(tf::StampedTransform(transform, last_odom_stamp, "world", "camera")); //publish transform from world
+  frame to quadrotor frame.*/
 }
 
-void pubCameraPose(const ros::TimerEvent &event)
+void pubCameraPose(const ros::TimerEvent& event)
 {
   // cout<<"pub cam pose"
   geometry_msgs::PoseStamped camera_pose;
@@ -159,7 +160,7 @@ void pubCameraPose(const ros::TimerEvent &event)
   pub_pose.publish(camera_pose);
 }
 
-void renderSensedPoints(const ros::TimerEvent &event)
+void renderSensedPoints(const ros::TimerEvent& event)
 {
   // if(! has_global_map || ! has_odom_) return;
   if (!has_global_map && !has_local_map)
@@ -172,7 +173,7 @@ void renderSensedPoints(const ros::TimerEvent &event)
 }
 
 vector<float> cloud_data;
-void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2& pointcloud_map)
 {
   if (has_global_map)
     return;
@@ -193,12 +194,12 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
   printf("global map has points: %d.\n", (int)cloud_data.size() / 3);
   // pass cloud_data to depth render
   depthrender.set_data(cloud_data);
-  depth_hostptr = (int *)malloc(width * height * sizeof(int));
+  depth_hostptr = (int*)malloc(width * height * sizeof(int));
 
   has_global_map = true;
 }
 
-void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2& pointcloud_map)
 {
   // ROS_WARN("Local Pointcloud received..");
   // load local map
@@ -221,7 +222,7 @@ void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
   // printf("local map has points: %d.\n", (int)cloud_data.size() / 3 );
   // pass cloud_data to depth render
   depthrender.set_data(cloud_data);
-  depth_hostptr = (int *)malloc(width * height * sizeof(int));
+  depth_hostptr = (int*)malloc(width * height * sizeof(int));
 
   has_local_map = true;
 }
@@ -324,7 +325,7 @@ void render_currentpose()
   // cv::imshow("depth_image", adjMap);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "pcl_render");
   ros::NodeHandle nh("~");
@@ -350,10 +351,7 @@ int main(int argc, char **argv)
   //               -0.0257744366974, 0.00375618835797, 0.999660727178, 0.00981073058949,
   //               0.0, 0.0, 0.0, 1.0;
 
-  cam02body << 0.0, 0.0, 1.0, 0.0,
-      -1.0, 0.0, 0.0, 0.0,
-      0.0, -1.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 1.0;
+  cam02body << 0.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
 
   // init cam2world transformation
   cam2world = Matrix4d::Identity();

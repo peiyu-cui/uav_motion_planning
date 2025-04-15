@@ -14,7 +14,7 @@
   <run_depend>message_runtime</run_depend>
   <export>
     <cpp cflags="-I${prefix}/include"
-         lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib"/>
+      lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib" />
   </export>
 
 </package>

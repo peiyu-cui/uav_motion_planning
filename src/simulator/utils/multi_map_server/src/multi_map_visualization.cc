@@ -15,7 +15,7 @@ vector<geometry_msgs::Pose> origins2d;
 vector<Map3D> maps3d;
 vector<geometry_msgs::Pose> origins3d;
 
-void maps2d_callback(const multi_map_server::MultiOccupancyGrid::ConstPtr &msg)
+void maps2d_callback(const multi_map_server::MultiOccupancyGrid::ConstPtr& msg)
 {
   // Merge map
   maps2d.resize(msg->maps.size(), Map2D(4));
@@ -34,7 +34,7 @@ void maps2d_callback(const multi_map_server::MultiOccupancyGrid::ConstPtr &msg)
   pub1.publish(m);
 }
 
-void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr &msg)
+void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr& msg)
 {
   // Update incremental map
   maps3d.resize(msg->maps.size());
@@ -74,7 +74,7 @@ void maps3d_callback(const multi_map_server::MultiSparseMap3D::ConstPtr &msg)
   pub2.publish(m);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "multi_map_visualization");
   ros::NodeHandle n("~");

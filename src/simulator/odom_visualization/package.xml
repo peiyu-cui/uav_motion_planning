@@ -14,6 +14,7 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
+  <build_depend>quadrotor_msgs</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>pose_utils</build_depend>
 
@@ -21,6 +22,7 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>visualization_msgs</run_depend>
+  <run_depend>quadrotor_msgs</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>pose_utils</run_depend>
 

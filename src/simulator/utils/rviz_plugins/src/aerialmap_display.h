@@ -60,9 +60,9 @@ class VectorProperty;
  * \class AerialMapDisplay
  * \brief Displays a map along the XY plane.
  */
-class AerialMapDisplay: public Display
+class AerialMapDisplay : public Display
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   AerialMapDisplay();
   virtual ~AerialMapDisplay();
@@ -71,19 +71,33 @@ public:
   virtual void onInitialize();
   virtual void fixedFrameChanged();
   virtual void reset();
-  virtual void update( float wall_dt, float ros_dt );
+  virtual void update(float wall_dt, float ros_dt);
 
-  float getResolution() { return resolution_; }
-  int getWidth() { return width_; }
-  int getHeight() { return height_; }
-  Ogre::Vector3 getPosition() { return position_; }
-  Ogre::Quaternion getOrientation() { return orientation_; }
+  float getResolution()
+  {
+    return resolution_;
+  }
+  int getWidth()
+  {
+    return width_;
+  }
+  int getHeight()
+  {
+    return height_;
+  }
+  Ogre::Vector3 getPosition()
+  {
+    return position_;
+  }
+  Ogre::Quaternion getOrientation()
+  {
+    return orientation_;
+  }
 
 protected Q_SLOTS:
   void updateAlpha();
   void updateTopic();
   void updateDrawUnder();
-
 
 protected:
   // overrides from Display
@@ -129,6 +143,6 @@ protected:
   bool new_map_;
 };
 
-} // namespace rviz
+}  // namespace rviz
 
- #endif
+#endif

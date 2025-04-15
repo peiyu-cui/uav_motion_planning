@@ -42,11 +42,13 @@
 #rosbuild_add_link_flags(so3_control_nodelet -Wl,--as-needed)
 
 #----------------------------------
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(so3_control)
 
+add_compile_options(-std=c++11)
+# set(CMAKE_BUILD_TYPE "Debug")
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 ## Find catkin macros and libraries
@@ -60,7 +62,10 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   cmake_utils
 )
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+find_package(Eigen3 REQUIRED)
+
+# set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -101,7 +106,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 #   MultiSparseMap3D.msg
 #   SparseMap3D.msg
 #   VerticalOccupancyGridList.msg
-   #plan_cmd.msg
+#plan_cmd.msg
 #)
 
 ## Generate services in the 'srv' folder
@@ -135,10 +140,10 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES irobot_msgs
-#  CATKIN_DEPENDS geometry_msgs nav_msgs
-#  DEPENDS system_lib
+  #  INCLUDE_DIRS include
+  #  LIBRARIES irobot_msgs
+  #  CATKIN_DEPENDS geometry_msgs nav_msgs
+  #  DEPENDS system_lib
 )
 
 ###########
@@ -147,15 +152,13 @@ catkin_package(
 #find_package(Armadillo REQUIRED)
 #include_directories(${ARMADILLO_INCLUDE_DIRS})
 
-find_package(Eigen3 REQUIRED)
-
-include_directories(${EIGEN3_INCLUDE_DIR})
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 ## Declare a cpp library
@@ -168,13 +171,13 @@ include_directories(
 add_library(SO3Control src/SO3Control.cpp)
 add_library(so3_control_nodelet src/so3_control_nodelet.cpp)
 
-target_link_libraries(so3_control_nodelet 
+target_link_libraries(so3_control_nodelet
   ${catkin_LIBRARIES}
   SO3Control
 )
 
 add_executable(control_example src/control_example.cpp)
-target_link_libraries(control_example 
+target_link_libraries(control_example
   ${catkin_LIBRARIES}
 )
 

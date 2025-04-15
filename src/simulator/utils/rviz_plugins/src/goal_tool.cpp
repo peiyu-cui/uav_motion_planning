@@ -43,21 +43,20 @@ Goal3DTool::Goal3DTool()
 {
   shortcut_key_ = 'g';
 
-  topic_property_ = new StringProperty( "Topic", "goal",
-                                        "The topic on which to publish navigation goals.",
-                                        getPropertyContainer(), SLOT( updateTopic() ), this );
+  topic_property_ =
+      new StringProperty("Topic", "goal", "The topic on which to publish navigation goals.", getPropertyContainer(), SLOT(updateTopic()), this);
 }
 
 void Goal3DTool::onInitialize()
 {
   Pose3DTool::onInitialize();
-  setName( "3D Nav Goal" );
+  setName("3D Nav Goal");
   updateTopic();
 }
 
 void Goal3DTool::updateTopic()
 {
-  pub_ = nh_.advertise<geometry_msgs::PoseStamped>( topic_property_->getStdString(), 1 );
+  pub_ = nh_.advertise<geometry_msgs::PoseStamped>(topic_property_->getStdString(), 1);
 }
 
 void Goal3DTool::onPoseSet(double x, double y, double z, double theta)
@@ -70,12 +69,12 @@ void Goal3DTool::onPoseSet(double x, double y, double z, double theta)
   geometry_msgs::PoseStamped goal;
   tf::poseStampedTFToMsg(p, goal);
   ROS_INFO("Setting goal: Frame:%s, Position(%.3f, %.3f, %.3f), Orientation(%.3f, %.3f, %.3f, %.3f) = Angle: %.3f\n", fixed_frame.c_str(),
-      goal.pose.position.x, goal.pose.position.y, goal.pose.position.z,
-      goal.pose.orientation.x, goal.pose.orientation.y, goal.pose.orientation.z, goal.pose.orientation.w, theta);
+           goal.pose.position.x, goal.pose.position.y, goal.pose.position.z, goal.pose.orientation.x, goal.pose.orientation.y,
+           goal.pose.orientation.z, goal.pose.orientation.w, theta);
   pub_.publish(goal);
 }
 
-} // end namespace rviz
+}  // end namespace rviz
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS( rviz::Goal3DTool, rviz::Tool )
+PLUGINLIB_EXPORT_CLASS(rviz::Goal3DTool, rviz::Tool)

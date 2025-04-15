@@ -13,29 +13,31 @@
 #include <iostream>
 #include <pcl/search/impl/kdtree.hpp>
 #include <vector>
+#include <string>
 
 using namespace std;
 using namespace Eigen;
 
 ros::Publisher cloud_pub_;
+std::string frame_id_;
 
-sensor_msgs::PointCloud2 local_map_pcl, local_depth_pcl;
+// sensor_msgs::PointCloud2 local_map_pcl, local_depth_pcl;
 
-ros::Subscriber odom_sub_, global_map_sub_, local_map_sub_;
+ros::Subscriber odom_sub_, global_map_sub_, dynamic_sub_;  // , local_map_sub_
 
 ros::Timer local_sensing_timer_;
 
 bool has_global_map(false);
-bool has_local_map(false);
+// bool has_local_map(false);
 bool has_odom_(false);
 
 nav_msgs::Odometry odom_;
 
-double sensing_horizon_, sensing_rate_, estimation_rate_;
-double x_size_, y_size_, z_size_;
-double x_l_, y_l_, z_l_;
-double resolution_, inv_resolution_;
-int GLX_SIZE_, GLY_SIZE_, GLZ_SIZE_;
+double sensing_horizon_, sensing_rate_;  // , estimation_rate_;
+// double x_size_, y_size_, z_size_;
+// double x_l_, y_l_, z_l_;
+// double resolution_, inv_resolution_;
+// int GLX_SIZE_, GLY_SIZE_, GLZ_SIZE_;
 
 ros::Time last_odom_stamp = ros::TIME_MAX;
 
@@ -47,31 +49,31 @@ pcl::search::KdTree<pcl::PointXYZ> kdtreeLocalMap_;
 vector<int> pointIdxRadiusSearch_;
 vector<float> pointRadiusSquaredDistance_;
 
-inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i &index)
-{
-  Eigen::Vector3d pt;
-  pt(0) = ((double)index(0) + 0.5) * resolution_ + x_l_;
-  pt(1) = ((double)index(1) + 0.5) * resolution_ + y_l_;
-  pt(2) = ((double)index(2) + 0.5) * resolution_ + z_l_;
-  return pt;
-};
+// inline Eigen::Vector3d gridIndex2coord(const Eigen::Vector3i &index)
+// {
+//   Eigen::Vector3d pt;
+//   pt(0) = ((double)index(0) + 0.5) * resolution_ + x_l_;
+//   pt(1) = ((double)index(1) + 0.5) * resolution_ + y_l_;
+//   pt(2) = ((double)index(2) + 0.5) * resolution_ + z_l_;
+//   return pt;
+// };
 
-inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d &pt)
-{
-  Eigen::Vector3i idx;
-  idx(0) = std::min(std::max(int((pt(0) - x_l_) * inv_resolution_), 0), GLX_SIZE_ - 1);
-  idx(1) = std::min(std::max(int((pt(1) - y_l_) * inv_resolution_), 0), GLY_SIZE_ - 1);
-  idx(2) = std::min(std::max(int((pt(2) - z_l_) * inv_resolution_), 0), GLZ_SIZE_ - 1);
-  return idx;
-};
+// inline Eigen::Vector3i coord2gridIndex(const Eigen::Vector3d &pt)
+// {
+//   Eigen::Vector3i idx;
+//   idx(0) = std::min(std::max(int((pt(0) - x_l_) * inv_resolution_), 0), GLX_SIZE_ - 1);
+//   idx(1) = std::min(std::max(int((pt(1) - y_l_) * inv_resolution_), 0), GLY_SIZE_ - 1);
+//   idx(2) = std::min(std::max(int((pt(2) - z_l_) * inv_resolution_), 0), GLZ_SIZE_ - 1);
+//   return idx;
+// };
 
-void rcvOdometryCallbck(const nav_msgs::Odometry &odom)
+void odomCallbck(const nav_msgs::Odometry& odom)
 {
   has_odom_ = true;
   odom_ = odom;
 }
 
-void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+void globalPointCloudCallBack(const sensor_msgs::PointCloud2& pointcloud_map)
 {
   if (has_global_map)
     return;
@@ -90,12 +92,18 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
   has_global_map = true;
 }
 
-void rcvLocalPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+// void localPointCloudCallBack(const sensor_msgs::PointCloud2 &pointcloud_map)
+// {
+//   // do nothing, fix later
+// }
+
+void dynamicCloudCallBack(const geometry_msgs::PoseStamped& msg)
 {
-  // do nothing, fix later
+  has_global_map = false;
+  ros::Duration(0.5).sleep();  // adhoc
 }
 
-void renderSensedPoints(const ros::TimerEvent &event)
+void renderSensedPoints(const ros::TimerEvent& event)
 {
   if (!has_global_map || !has_odom_)
     return;
@@ -122,8 +130,7 @@ void renderSensedPoints(const ros::TimerEvent &event)
     {
       pt = cloud_all_map_.points[pointIdxRadiusSearch_[i]];
 
-      // if ((fabs(pt.z - odom_.pose.pose.position.z) / (pt.x - odom_.pose.pose.position.x)) >
-      //     tan(M_PI / 12.0))
+      // if ((fabs(pt.z - odom_.pose.pose.position.z) / (pt.x - odom_.pose.pose.position.x)) > tan(M_PI / 12.0))
       //   continue;
       if ((fabs(pt.z - odom_.pose.pose.position.z) / sensing_horizon_) > tan(M_PI / 6.0))
         continue;
@@ -146,45 +153,47 @@ void renderSensedPoints(const ros::TimerEvent &event)
   local_map_.is_dense = true;
 
   pcl::toROSMsg(local_map_, local_map_pcd_);
-  local_map_pcd_.header.frame_id = "world";
+  local_map_pcd_.header.frame_id = frame_id_;
 
   cloud_pub_.publish(local_map_pcd_);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "pcl_render_node");
   ros::NodeHandle nh("~");
 
   nh.getParam("sensing_horizon", sensing_horizon_);
   nh.getParam("sensing_rate", sensing_rate_);
-  nh.getParam("estimation_rate", estimation_rate_);
+  // nh.getParam("estimation_rate", estimation_rate_);
 
-  nh.getParam("map/x_size", x_size_);
-  nh.getParam("map/y_size", y_size_);
-  nh.getParam("map/z_size", z_size_);
+  // nh.getParam("map/x_size", x_size_);
+  // nh.getParam("map/y_size", y_size_);
+  // nh.getParam("map/z_size", z_size_);
+  nh.param("frame_id", frame_id_, string("world"));
 
   // subscribe point cloud
-  odom_sub_ = nh.subscribe("odom", 50, rcvOdometryCallbck);
-  global_map_sub_ = nh.subscribe("global_map", 1, rcvGlobalPointCloudCallBack);
-  local_map_sub_ = nh.subscribe("local_map", 1, rcvLocalPointCloudCallBack);
+  odom_sub_ = nh.subscribe("odom", 10, odomCallbck);
+  global_map_sub_ = nh.subscribe("global_map", 10, globalPointCloudCallBack);
+  // local_map_sub_ = nh.subscribe("local_map", 10, localPointCloudCallBack);
+  dynamic_sub_ = nh.subscribe("/move_base_simple/goal", 10, dynamicCloudCallBack);
 
   // publisher depth image and color image
   cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("cloud", 10);
 
-  double sensing_duration = 1.0 / sensing_rate_ * 2.5;
+  double sensing_duration = 1.0 / sensing_rate_;
 
   local_sensing_timer_ = nh.createTimer(ros::Duration(sensing_duration), renderSensedPoints);
 
-  inv_resolution_ = 1.0 / resolution_;
+  // inv_resolution_ = 1.0 / resolution_;
 
-  x_l_ = -x_size_ / 2.0;
-  y_l_ = -y_size_ / 2.0;
-  z_l_ = 0.0;
+  // x_l_ = -x_size_ / 2.0;
+  // y_l_ = -y_size_ / 2.0;
+  // z_l_ = 0.0;
 
-  GLX_SIZE_ = (int)(x_size_ * inv_resolution_);
-  GLY_SIZE_ = (int)(y_size_ * inv_resolution_);
-  GLZ_SIZE_ = (int)(z_size_ * inv_resolution_);
+  // GLX_SIZE_ = (int)(x_size_ * inv_resolution_);
+  // GLY_SIZE_ = (int)(y_size_ * inv_resolution_);
+  // GLZ_SIZE_ = (int)(z_size_ * inv_resolution_);
 
   ros::Rate rate(100);
   bool status = ros::ok();

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <rosparam file="$(find quadrotor_mpc)/config/controller_param.yaml" command="load" />
+  <rosparam file="$(find quadrotor_mpc)/config/reference_param.yaml" command="load" />
+  <rosparam file="$(find quadrotor_mpc)/config/robot_param.yaml" command="load" />
+
+  <node pkg="quadrotor_mpc" type="controller_node" name="controller_node" output="screen">
+    <remap from="odom" to="/airsim_node/drone_1/odom_local_enu" />
+    <remap from="imu" to="/airsim_node/drone_1/imu/Imu" />
+    <remap from="ctrl" to="/setpoint_raw/attitude" />
+    <remap from="takeoff" to="/airsim_node/drone_1/takeoff" />
+  </node>
+
+  <node pkg="rosbag" type="record" name="bag_record" args="/airsim_node/drone_1/odom_local_enu /airsim_node/drone_1/imu/Imu -o /home/gzy/reference_pos.bag" />
+
+</launch>

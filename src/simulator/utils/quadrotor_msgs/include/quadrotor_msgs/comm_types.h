@@ -5,13 +5,13 @@
 struct SO3_CMD_INPUT
 {
   // Scaling factors when decoding
-  int16_t force[3];                      // /500
-  int8_t des_qx, des_qy, des_qz, des_qw; // /125
-  uint8_t kR[3];                         // /50
-  uint8_t kOm[3];                        // /100
-  int16_t cur_yaw;                       // /1e4
-  int16_t kf_correction;                 // /1e11;
-  uint8_t angle_corrections[2];          // roll,pitch /2500
+  int16_t force[3];                       // /500
+  int8_t des_qx, des_qy, des_qz, des_qw;  // /125
+  uint8_t kR[3];                          // /50
+  uint8_t kOm[3];                         // /100
+  int16_t cur_yaw;                        // /1e4
+  int16_t kf_correction;                  // /1e11;
+  uint8_t angle_corrections[2];           // roll,pitch /2500
   uint8_t enable_motors : 1;
   uint8_t use_external_yaw : 1;
   uint8_t seq;

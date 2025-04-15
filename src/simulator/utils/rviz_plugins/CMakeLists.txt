@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(rviz_plugins)
 
 ## Find catkin macros and libraries
@@ -6,7 +6,7 @@ project(rviz_plugins)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rviz
-  #multi_map_server
+  # multi_map_server
   roscpp
 )
 
@@ -20,10 +20,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES irobot_msgs
-  CATKIN_DEPENDS #multi_map_server
-#  DEPENDS system_lib
+  # INCLUDE_DIRS include
+  # LIBRARIES irobot_msgs
+  # CATKIN_DEPENDS multi_map_server
+  # DEPENDS system_lib
 )
 
 ###########
@@ -56,9 +56,9 @@ add_definitions(-DQT_NO_KEYWORDS)
 ## Qt's meta-object compiler.
 qt5_wrap_cpp(MOC_FILES
   src/goal_tool.h
-#  src/probmap_display.h
-#  src/aerialmap_display.h    
-#  src/multi_probmap_display.h      
+  # src/probmap_display.h
+  # src/aerialmap_display.h
+  # src/multi_probmap_display.h
 )
 
 ## Here we specify the list of source files, including the output of
@@ -66,17 +66,17 @@ qt5_wrap_cpp(MOC_FILES
 set(SOURCE_FILES
   src/pose_tool.cpp
   src/goal_tool.cpp
-#  src/probmap_display.cpp
-#  src/aerialmap_display.cpp   
-#  src/multi_probmap_display.cpp  
+  # src/probmap_display.cpp
+  # src/aerialmap_display.cpp
+  # src/multi_probmap_display.cpp
   ${MOC_FILES}
 )
 
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 

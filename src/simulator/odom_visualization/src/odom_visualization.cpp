@@ -25,7 +25,7 @@ colvec poseOrigin(6);
 ros::Publisher pose_pub_, path_pub_, vel_pub_, cov_pub_, cov_vel_pub_, traj_pub_, sensor_pub_, mesh_pub_, height_pub_;
 ros::Subscriber odom_sub_, cmd_sub_;
 
-tf::TransformBroadcaster *broadcaster;
+tf::TransformBroadcaster* broadcaster;
 geometry_msgs::PoseStamped poseROS;
 nav_msgs::Path pathROS;
 
@@ -34,7 +34,7 @@ visualization_msgs::Marker velROS, covROS, covVelROS, trajROS, sensorROS, meshRO
 sensor_msgs::Range heightROS;
 string frame_id_;
 
-void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
+void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
   if (msg->header.frame_id == string("null"))
     return;
@@ -70,7 +70,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   // Pose
   poseROS.header = msg->header;
   poseROS.header.stamp = msg->header.stamp;
-  poseROS.header.frame_id = string("world");
+  poseROS.header.frame_id = frame_id_;
   poseROS.pose.position.x = pose(0);
   poseROS.pose.position.y = pose(1);
   poseROS.pose.position.z = pose(2);
@@ -87,7 +87,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   yprVel(1) = -atan2(vel(2), norm(vel.rows(0, 1), 2));
   yprVel(2) = 0;
   q = R_to_quaternion(ypr_to_R(yprVel));
-  velROS.header.frame_id = string("world");
+  velROS.header.frame_id = frame_id_;
   velROS.header.stamp = msg->header.stamp;
   velROS.ns = string("velocity");
   velROS.id = 0;
@@ -120,9 +120,9 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   }
 
   // Covariance color
-  double r = 1;
-  double g = 1;
-  double b = 1;
+  double r = 0.8;
+  double g = 0.8;
+  double b = 0.0;
   bool G = msg->twist.covariance[33];
   bool V = msg->twist.covariance[34];
   bool L = msg->twist.covariance[35];
@@ -156,7 +156,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
         }
       }
     }
-    covROS.header.frame_id = string("world");
+    covROS.header.frame_id = frame_id_;
     covROS.header.stamp = msg->header.stamp;
     covROS.ns = string("covariance");
     covROS.id = 0;
@@ -205,7 +205,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
         }
       }
     }
-    covVelROS.header.frame_id = string("world");
+    covVelROS.header.frame_id = frame_id_;
     covVelROS.header.stamp = msg->header.stamp;
     covVelROS.ns = string("covariance_velocity");
     covVelROS.id = 0;
@@ -235,7 +235,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   ros::Time t = msg->header.stamp;
   if ((t - pt).toSec() > 0.5)
   {
-    trajROS.header.frame_id = string("world");
+    trajROS.header.frame_id = frame_id_;
     trajROS.header.stamp = ros::Time::now();
     trajROS.ns = string("trajectory");
     trajROS.type = visualization_msgs::Marker::LINE_LIST;
@@ -276,7 +276,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   }
 
   // Sensor availability
-  sensorROS.header.frame_id = string("world");
+  sensorROS.header.frame_id = frame_id_;
   sensorROS.header.stamp = msg->header.stamp;
   sensorROS.ns = string("sensor");
   sensorROS.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
@@ -365,7 +365,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
     colvec q90 = R_to_quaternion(ypr_to_R(p90));
     transform90.setRotation(tf::Quaternion(q90(1), q90(2), q90(3), q90(0)));
 
-    broadcaster->sendTransform(tf::StampedTransform(transform, msg->header.stamp, string("world"), string("base")));
+    broadcaster->sendTransform(tf::StampedTransform(transform, msg->header.stamp, frame_id_, string("base")));
     broadcaster->sendTransform(tf::StampedTransform(transform45, msg->header.stamp, string("base"), string("laser")));
     broadcaster->sendTransform(tf::StampedTransform(transform45, msg->header.stamp, string("base"), string("vision")));
     broadcaster->sendTransform(tf::StampedTransform(transform90, msg->header.stamp, string("base"), string("height")));
@@ -420,7 +420,7 @@ void cmd_callback(const quadrotor_msgs::PositionCommand cmd)
   mesh_pub_.publish(meshROS);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "odom_visualization");
   ros::NodeHandle nh("~");
@@ -428,16 +428,16 @@ int main(int argc, char **argv)
   // nh.param("mesh_resource", mesh_resource, std::string("package://odom_visualization/meshes/hummingbird.mesh"));
   nh.param("mesh_resource", mesh_resource, std::string("package://odom_visualization/meshes/f250.dae"));
 
+  nh.param("frame_id", frame_id_, string("world"));
   nh.param("color/r", color_r_, 1.0);
   nh.param("color/g", color_g_, 0.0);
   nh.param("color/b", color_b_, 0.0);
   nh.param("color/a", color_a_, 1.0);
   nh.param("origin", origin_, false);
-  nh.param("robot_scale", scale_, 2.0);
-  nh.param("frame_id", frame_id_, string("world"));
+  nh.param("robot_scale", scale_, 1.0);
 
-  nh.param("cross_config", cross_config_, false);
   nh.param("tf45", tf45_, false);
+  nh.param("cross_config", cross_config_, false);
   nh.param("covariance_scale", cov_scale_, 100.0);
   nh.param("covariance_position", cov_pos_, false);
   nh.param("covariance_velocity", cov_vel_, false);

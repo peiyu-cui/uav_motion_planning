@@ -37,7 +37,7 @@
 #rosbuild_add_executable(so3_disturbance_generator src/so3_disturbance_generator.cpp)
 #target_link_libraries(so3_disturbance_generator pose_utils)
 #----------------------------------
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(so3_disturbance_generator)
 
 ## Find catkin macros and libraries
@@ -55,21 +55,21 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Armadillo REQUIRED)
-include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 catkin_package()
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
+  ${ARMADILLO_INCLUDE_DIRS}
 )
 
 add_executable(so3_disturbance_generator src/so3_disturbance_generator.cpp)
-add_dependencies(so3_disturbance_generator ${PROJECT_NAME}_gencfg)
-target_link_libraries(so3_disturbance_generator 
-   ${catkin_LIBRARIES}
-   ${ARMADILLO_LIBRARIES}
+# add_dependencies(so3_disturbance_generator ${PROJECT_NAME}_gencfg)
+target_link_libraries(so3_disturbance_generator
+  ${catkin_LIBRARIES}
+  ${ARMADILLO_LIBRARIES}
 )
 

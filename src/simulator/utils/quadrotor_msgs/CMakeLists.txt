@@ -40,24 +40,25 @@
 #-rosbuild_add_link_flags(decode_msgs -Wl,--as-needed)
 
 #------------------------------------------------------------------
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(quadrotor_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
-  #armadillo
   roscpp
   nav_msgs
   geometry_msgs
   message_generation
 )
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+find_package(Eigen3 REQUIRED)
+
+# set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
 )
-
 
 add_message_files(
   FILES
@@ -98,11 +99,7 @@ add_library(encode_msgs src/encode_msgs.cpp)
 add_dependencies(encode_msgs quadrotor_msgs_generate_messages_cpp)
 add_dependencies(decode_msgs quadrotor_msgs_generate_messages_cpp)
 
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
 # target_link_libraries(test_exe 
 #     decode_msgs 
 #     encode_msgs
 # )
-

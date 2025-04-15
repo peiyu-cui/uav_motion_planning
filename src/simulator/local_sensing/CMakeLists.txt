@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(local_sensing_node)
 
 set(CMAKE_BUILD_TYPE Release)
-ADD_COMPILE_OPTIONS(-std=c++11 )
-ADD_COMPILE_OPTIONS(-std=c++14 )
+ADD_COMPILE_OPTIONS(-std=c++11)
+ADD_COMPILE_OPTIONS(-std=c++14)
 
 set(ENABLE_CUDA false)
 # set(ENABLE_CUDA true)
@@ -11,7 +11,7 @@ set(ENABLE_CUDA false)
 if(ENABLE_CUDA)
   find_package(CUDA REQUIRED)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -use_fast_math)
-  set(CUDA_NVCC_FLAGS 
+  set(CUDA_NVCC_FLAGS
     # -gencode arch=compute_20,code=sm_20;
     # -gencode arch=compute_20,code=sm_21;
     # -gencode arch=compute_30,code=sm_30;
@@ -22,7 +22,7 @@ if(ENABLE_CUDA)
     # -gencode arch=compute_61,code=sm_61;
     # -gencode arch=compute_75,code=sm_75;
     -gencode arch=compute_89,code=sm_89;
-  ) 
+  )
 
   set(CUDA_PROPAGATE_HOST_FLAGS OFF)
 
@@ -31,16 +31,16 @@ if(ENABLE_CUDA)
   find_package(Boost REQUIRED COMPONENTS system filesystem)
 
   find_package(catkin REQUIRED COMPONENTS
-    roscpp 
-    roslib 
-    cmake_modules 
-    cv_bridge 
-    image_transport 
-    pcl_ros 
-    sensor_msgs 
-    geometry_msgs 
-    nav_msgs 
-    quadrotor_msgs 
+    roscpp
+    roslib
+    cmake_modules
+    cv_bridge
+    image_transport
+    pcl_ros
+    sensor_msgs
+    geometry_msgs
+    nav_msgs
+    quadrotor_msgs
     dynamic_reconfigure
   )
 
@@ -56,7 +56,7 @@ if(ENABLE_CUDA)
   )
 
   include_directories(
-    SYSTEM 
+    SYSTEM
     #include 
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
@@ -80,23 +80,23 @@ if(ENABLE_CUDA)
 else(ENABLE_CUDA)
   find_package(Eigen3 REQUIRED)
   find_package(catkin REQUIRED COMPONENTS
-    roscpp 
-    roslib 
-    cmake_modules 
-    pcl_ros 
-    sensor_msgs 
-    geometry_msgs 
-    nav_msgs 
+    roscpp
+    roslib
+    cmake_modules
+    pcl_ros
+    sensor_msgs
+    geometry_msgs
+    nav_msgs
     quadrotor_msgs
   )
-  
+
   catkin_package(
     DEPENDS Eigen
     CATKIN_DEPENDS roscpp roslib pcl_ros
   )
 
   include_directories(
-    SYSTEM 
+    SYSTEM
     ${catkin_INCLUDE_DIRS}
     ${Eigen_INCLUDE_DIRS}
   )

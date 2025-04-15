@@ -28,7 +28,7 @@ nav_msgs::Path waypoints;
 std::deque<nav_msgs::Path> waypointSegments;
 ros::Time trigged_time;
 
-void load_seg(ros::NodeHandle &nh, int segid, const ros::Time &time_base)
+void load_seg(ros::NodeHandle& nh, int segid, const ros::Time& time_base)
 {
   std::string seg_str = boost::str(bfmt("seg%d/") % segid);
   double yaw;
@@ -73,7 +73,7 @@ void load_seg(ros::NodeHandle &nh, int segid, const ros::Time &time_base)
   waypointSegments.push_back(path_msg);
 }
 
-void load_waypoints(ros::NodeHandle &nh, const ros::Time &time_base)
+void load_waypoints(ros::NodeHandle& nh, const ros::Time& time_base)
 {
   int seg_cnt = 0;
   waypointSegments.clear();
@@ -124,7 +124,7 @@ void publish_waypoints_vis()
   pub2.publish(poseArray);
 }
 
-void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
+void odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
   is_odom_ready = true;
   odom = *msg;
@@ -138,11 +138,11 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
       std::stringstream ss;
       ss << bfmt("Series send %.3f from start:\n") % trigged_time.toSec();
-      for (auto &pose_stamped : waypoints.poses)
+      for (auto& pose_stamped : waypoints.poses)
       {
-        ss << bfmt("P[%.2f, %.2f, %.2f] q(%.2f,%.2f,%.2f,%.2f)") %
-                  pose_stamped.pose.position.x % pose_stamped.pose.position.y % pose_stamped.pose.position.z %
-                  pose_stamped.pose.orientation.w % pose_stamped.pose.orientation.x % pose_stamped.pose.orientation.y % pose_stamped.pose.orientation.z
+        ss << bfmt("P[%.2f, %.2f, %.2f] q(%.2f,%.2f,%.2f,%.2f)") % pose_stamped.pose.position.x % pose_stamped.pose.position.y %
+                  pose_stamped.pose.position.z % pose_stamped.pose.orientation.w % pose_stamped.pose.orientation.x % pose_stamped.pose.orientation.y %
+                  pose_stamped.pose.orientation.z
            << std::endl;
       }
       ROS_INFO_STREAM(ss.str());
@@ -155,14 +155,14 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   }
 }
 
-void goal_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
+void goal_callback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
   /*    if (!is_odom_ready) {
           ROS_ERROR("[waypoint_generator] No odom!");
           return;
       }*/
 
-  trigged_time = ros::Time::now(); // odom.header.stamp;
+  trigged_time = ros::Time::now();  // odom.header.stamp;
   // ROS_ASSERT(trigged_time > ros::Time(0));
 
   ros::NodeHandle n("~");
@@ -241,7 +241,7 @@ void goal_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
   }
 }
 
-void traj_start_trigger_callback(const geometry_msgs::PoseStamped &msg)
+void traj_start_trigger_callback(const geometry_msgs::PoseStamped& msg)
 {
   if (!is_odom_ready)
   {
@@ -287,7 +287,7 @@ void traj_start_trigger_callback(const geometry_msgs::PoseStamped &msg)
   }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "waypoint_generator");
   ros::NodeHandle n("~");

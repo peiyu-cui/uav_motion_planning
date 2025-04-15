@@ -3,7 +3,7 @@
   <name>so3_disturbance_generator</name>
   <description>
 
-     so3_disturbance_generator
+    so3_disturbance_generator
 
   </description>
 
@@ -30,5 +30,3 @@
   <run_depend>dynamic_reconfigure</run_depend>
 
 </package>
-
-
