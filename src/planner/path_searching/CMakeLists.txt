@@ -18,24 +18,23 @@ find_package(PCL 1.7 REQUIRED)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 
-set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 
 
 
 catkin_package(
- INCLUDE_DIRS include
- LIBRARIES path_searching kdtree
- CATKIN_DEPENDS plan_env
- DEPENDS PCL
+  INCLUDE_DIRS include
+  LIBRARIES path_searching kdtree
+  CATKIN_DEPENDS plan_env
+  DEPENDS PCL
 )
 
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include 
+  include
   ${catkin_INCLUDE_DIRS}
-  ${Eigen3_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
   ${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
