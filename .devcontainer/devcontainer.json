@@ -1,0 +1,32 @@
+{
+    "name": "ROS1 Noetic Dev Container",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "remoteUser": "cpu",
+    "workspaceFolder": "/home/cpu/uav_motion_planning",
+    "workspaceMount": "source=${localWorkspaceFolder}/,target=/home/cpu/uav_motion_planning,type=bind,consistency=cached",
+    "mounts": [
+        "source=/tmp,target=/tmp,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.ssh,target=/home/cpu/.ssh,type=bind,consistency=cached,readonly"
+    ],
+    "features": {
+        "ghcr.io/devcontainers/features/git:1.0.0": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "ms-python.python",
+                "ms-iot.vscode-ros"
+            ]
+        }
+    },
+    "runArgs": [
+        "--net=host",
+        "--pid=host",
+        "--env=DISPLAY=${env:DISPLAY}"
+    ]
+
+}

@@ -280,3 +280,37 @@
   - **Red Line**: RRT* Path
   - **Red Sphere**: RRT* Waypoints
   - **Purple Line**: minimum jerk trajectory
+
+## 4. Docker Usage
+*You can also use Docker to set up the development environment without installing dependencies on your host machine. Please install [foxglove](https://foxglove.dev/download) first.*
+
+1. Clone the repository.
+
+    ```bash
+    git clone https://github.com/peiyu-cui/uav_motion_planning.git
+    ```
+
+2. Go to the workspace folder and build the codes:
+   * Press `command + shift + p` in vscode, and type and select: `Dev Containers: Reopen in Container` to open a dev-container in vscode.
+   * Open a new terminal in vscode `control + shift + ~`, and this terminal is inside a container. We will working with this terminal in the following.
+3. Build the project
+    ```bash
+    catkin_make
+    ```
+4. Launch demo
+   * Launch foxglove_bridge
+    ```bash
+    roslaunch foxglove_bridge foxglove_bridge.launch port:=9090
+    ```
+    * Launch simulation
+    ```bash
+    # in one terminal
+    source devel/setup.zsh
+    roslaunch plan_manage single_run_in_foxglove.launch
+
+    # in another terminal
+    source devel/setup.zsh
+    roslaunch test test_rrt_star_searching.launch
+    ```
+5. Launch foxglove for visualization
+  Enter the WebSocket URL and type `ws://localhost:9090`, you can choose the ros topic to visualization.

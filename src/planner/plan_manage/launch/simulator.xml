@@ -111,7 +111,7 @@
     <param name="map/z_size" value="$(arg map_size_z_)" />
 
     <!-- virtual global cloud -->
-    <remap from="~global_map" to="/map_generator/global_cloud" />
+    <remap from="~global_map" to="/random_forest/global_cloud" />
     <remap from="~odom" to="$(arg odom_topic)" />
   </node>
 
